@@ -1,0 +1,6 @@
+This is a test file...:)
+Esc
+Vim save :w
+Vim save and quit :wq
+Vim quit :q!
+Vim save a file under a different name :w new_filename and enter
