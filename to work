@@ -1,0 +1,241 @@
+import json
+import sys
+import time
+from datetime import datetime
+from datetime import datetime as dt
+
+import boto3
+from awsglue.context import GlueContext
+from awsglue.dynamicframe import DynamicFrame
+from awsglue.job import Job
+from awsglue.utils import getResolvedOptions
+from pyspark.context import SparkContext
+from pyspark.sql.functions import lit, trim, col, unix_timestamp, udf, regexp_replace, to_utc_timestamp
+from pyspark.sql.types import array, ArrayType, IntegerType, ShortType, DecimalType, StringType, StructType, \
+    TimestampType
+
+glueContext = GlueContext(SparkContext())
+logger = glueContext.get_logger()
+# Glue: Add ACL permissions when writing to the Data Lake staging bucket
+glueContext._jsc.hadoopConfiguration().set("fs.s3.canned.acl", "BucketOwnerFullControl")
+glueJob = Job(glueContext)
+spark = glueContext.spark_session
+args = getResolvedOptions(sys.argv,
+                          ['JOB_NAME', 'source_bucket', 'dest_bucket', 'source_prefix_spi', 'source_prefix_non_spi',
+                           'dest_prefix_spi', 'dest_prefix_non_spi', 'eui_opt_config_bucket', 'rename_key',
+                           'datatype_chng_key'])
+JOB_NAME = args['JOB_NAME']
+source_bucket = args['source_bucket']
+dest_bucket = args['dest_bucket']
+source_prefix_spi = args['source_prefix_spi']
+source_prefix_non_spi = args['source_prefix_non_spi']
+dest_prefix_spi = args['dest_prefix_spi']
+dest_prefix_non_spi = args['dest_prefix_non_spi']
+eui_opt_config_bucket = args['eui_opt_config_bucket']  # Todo env variable
+rename_key = args['rename_key']
+datatype_chng_key = args['datatype_chng_key']
+source_path = []
+dest_dict = {}
+config_rename_lst = []
+config_datatype_lst = []
+
+
+def read_config_file(inBkt, inKey):
+    global config_rename_lst
+    global config_datatype_lst
+    s3 = boto3.client('s3')
+    config_obj = s3.get_object(
+        Bucket=inBkt,
+        Key=inKey)
+    config_data = config_obj['Body'].read()
+    config_data_json = json.loads(config_data)
+    return config_data_json
+
+
+def craete_flat_of_changes(configdata, table, oper):
+    config_flat_lst = []
+    global config_rename_lst
+    global config_datatype_lst
+    try:
+        for x, y in configdata[table.lower()].items():
+            config_flat_lst.append([table.lower(), x.strip(), y.strip()])
+    except KeyError:
+        logger.info(f'{table.lower()} does not require any operations for {oper}')
+
+    if oper == "rename":
+        config_rename_lst = list(config_flat_lst)
+        return config_rename_lst
+    elif oper == "datatype":
+        config_datatype_lst = list(config_flat_lst)
+        return config_datatype_lst
+
+
+def tryconvert(value, default):
+    try:
+        return dt.strptime(value, '%Y-%m-%d-%H.%M.%S.%f')
+    except (ValueError, TypeError):
+        return dt.strptime(default, '%Y-%m-%d-%H.%M.%S.%f')
+
+
+def update_data_type(inDF, inColList, oper):
+    """
+    Agruments:   get input dataframe at table level ( ex  - addr_info),
+    list element ex [ addr_info, colnane,target datatype]
+    """
+    outDF = inDF
+    if oper == 'datatype':
+        outDF = inDF.withColumn(inColList[1], trim(col(inColList[1])))
+        if inColList[2] == "timestamp":
+            outDF = outDF.withColumn(inColList[1],
+                                     regexp_replace(inColList[1], '^(.{4})-(.{2})-(.{2})-(.{2})\\.(.{2})\\.(.{2})',
+                                                    '$1-$2-$3 $4:$5:$6'))
+            outDF = outDF.withColumn(inColList[1], to_utc_timestamp(col(inColList[1]), "UTC"))
+        else:
+            outDF = outDF.withColumn(inColList[1], outDF[inColList[1]].cast(inColList[2]))
+        logger.info(f'{oper} changed for column {inColList[1]} to {inColList[2]}')
+    elif oper == 'rename':
+        outDF = inDF.withColumnRenamed(inColList[2], inColList[1])
+        logger.info(f'{oper}ed column {inColList[2]} to {inColList[1]}')
+
+    return outDF
+
+
+def drop_columns(inDyF, col1, col2):
+    outDF = inDyF.toDF().drop(col1, col2)
+    outDyF = DynamicFrame.fromDF(outDF, glueContext, "outDyF")
+    return outDyF
+
+
+def create_source_dest_path_non_spi():
+    s3_client = boto3.client('s3')
+    result = s3_client.list_objects(Bucket=source_bucket, Prefix=source_prefix_non_spi, Delimiter='/')
+    for prefixes in result.get('CommonPrefixes'):
+        source_path.append(prefixes.get('Prefix'))
+        dest_dict[prefixes.get('Prefix')] = (
+            str(prefixes.get('Prefix')).replace(source_prefix_non_spi, dest_prefix_non_spi))
+
+
+def create_source_dest_path_spi():
+    s3_client = boto3.client('s3')
+    result = s3_client.list_objects(Bucket=source_bucket, Prefix=source_prefix_spi, Delimiter='/')
+    for prefixes in result.get('CommonPrefixes'):
+        source_path.append(prefixes.get('Prefix'))
+        dest_dict[prefixes.get('Prefix')] = (str(prefixes.get('Prefix')).replace(source_prefix_spi, dest_prefix_spi))
+
+
+def stage_errors_count(etl_stage, error_count, job_name=JOB_NAME):
+    if error_count > 0:
+        raise Exception(
+            f'Error encountered in {etl_stage} with error count as {error_count}..ETL Job was aborted, Investigate {job_name} glue job error Logs')
+    pass
+
+
+def record_count(row_count, path_src):
+    if row_count < 1:
+        logger.info(
+            f'{row_count} records read from {path_src},nothing to write commit job and  exit 0')
+        glueJob.commit()
+    else:
+        logger.info(
+            f'{row_count} records read from {path_src},continuing with next stage')
+
+
+def glue_read(src_path, subfolder_name, ip_format='parquet'):
+    glue_read_input = glueContext.create_dynamic_frame_from_options(connection_type="s3",
+                                                                    connection_options={"paths": [src_path]},
+                                                                    format=ip_format,
+                                                                    transformation_ctx="dy_read_input_" + str(
+                                                                        subfolder_name))
+    return glue_read_input
+
+
+def glue_write(dst_path, subfolder_name, op_format='parquet'):
+    glue_write_output = glueContext.write_dynamic_frame_from_options(frame=dynamic_frame_output, connection_type='s3',
+                                                                     connection_options={"path": dst_path,
+                                                                                         "partitionKeys": [
+                                                                                             "ingestion_year",
+                                                                                             "ingestion_month",
+                                                                                             "ingestion_day"]
+                                                                                         },
+                                                                     format=op_format,
+                                                                     transformation_ctx="glue_dynamic_write_df_" + str(
+                                                                         subfolder_name))
+    return glue_write_output
+
+
+def add_processing_date(read_dynamic_frame):
+    add_processing_date_df = read_dynamic_frame.toDF().withColumn("ingestion_date",
+                                                                  lit(datetime.date(datetime.today()))) \
+        .withColumn("ingestion_year", lit(datetime.today().year)) \
+        .withColumn("ingestion_month", lit(datetime.today().month)) \
+        .withColumn("ingestion_day",
+                    lit(datetime.today().day))
+
+    return add_processing_date_df
+
+
+def calc_time():
+    logged_time = time.strftime('%Y-%m-%d %H:%M:%S')
+    return logged_time
+
+
+logger.info(f'glue job {JOB_NAME} started at {calc_time()}')
+
+try:
+    create_source_dest_path_non_spi()
+except TypeError as e:
+    logger.info('Looks like no files/prefixes in non_spi prefix')
+
+try:
+    create_source_dest_path_spi()
+except TypeError as e:
+    logger.info('Looks like no files/prefixes in spi prefix')
+    #  call to create list fucntion
+configdata_rename = read_config_file(eui_opt_config_bucket, rename_key)
+configdata_datatypechange = read_config_file(eui_opt_config_bucket, datatype_chng_key)
+
+for subfolder in source_path:
+    if subfolder.split("/")[1] == 'HHLD_NON_CR_DETL':  # to limit iteration  HHLD_NON_CR_DETL
+        qualified_path_src = "s3://" + source_bucket + "/" + subfolder
+        qualified_path_dst = "s3://" + dest_bucket + "/" + dest_dict[subfolder]
+        glueJob.init(args['JOB_NAME'], args)
+        job_start_time = time.time()
+        dy_read_input = glue_read(qualified_path_src, subfolder)
+        record_count(dy_read_input.count(), qualified_path_src)
+        if dy_read_input.count() == 0:
+            continue
+        stage_errors_count('create_dynamic_frame_from_options', dy_read_input.stageErrorsCount())
+        # drop columnns from prod_ord table
+        if subfolder.split("/")[1] == 'PROD_ORD':
+            logger.info(f'prod_ord schema - {dy_read_input.printSchema()}')
+            add_processing_date_dataframe = add_processing_date(drop_columns(dy_read_input, 'CASE_NUM', 'DO_NOT_USE'))
+        else:
+            add_processing_date_dataframe = add_processing_date(dy_read_input)
+
+        #  new function  calls to read changes from json file to rename columns
+        #  new function calls  to read changes from json file for datatype changes
+        #  new function  calls to rename columns
+        #  new function calls  to change datatype column
+        #  subfolder  is like /eui/addr_info
+        prefix = subfolder.split("/")[1]
+        config_rename_prefix_lst = craete_flat_of_changes(configdata_rename, prefix, 'rename')
+        config_datatype_prefix_lst = craete_flat_of_changes(configdata_datatypechange, prefix, 'datatype')
+        renamed_df = add_processing_date_dataframe
+        logger.info(f'***** transformations for {prefix} will be starting *****')
+        for itrlist in config_rename_prefix_lst:
+            renamed_df = update_data_type(renamed_df, itrlist, 'rename')
+        datatype_renamed_df = renamed_df
+        for itrlist in config_datatype_prefix_lst:
+            datatype_renamed_df = update_data_type(datatype_renamed_df, itrlist, 'datatype')
+        logger.info(datatype_renamed_df.printSchema())
+        logger.info(f'*****transformations for {prefix} completed *****')
+
+        dynamic_frame_output = DynamicFrame.fromDF(datatype_renamed_df, glueContext, "dynamic_frame_output")
+        stage_errors_count('DataFrame_to_DynamicFrame', dynamic_frame_output.stageErrorsCount())
+        logger.info(str(qualified_path_dst))
+        glue_dynamic_write_df = glue_write(qualified_path_dst, subfolder)
+        stage_errors_count('write_dynamic_frame_from_options', glue_dynamic_write_df.stageErrorsCount())
+        job_end_time = time.time()
+        glueJob.commit()
+        logger.info(f' {job_end_time - job_start_time} seconds taken to complete {qualified_path_src} path')
+logger.info(f'glue job {JOB_NAME} completed at {calc_time()}')
