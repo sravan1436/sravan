@@ -1,0 +1,600 @@
+import sys
+import functools
+from awsglue.context import GlueContext
+from awsglue.job import Job
+from awsglue.dynamicframe import DynamicFrame
+from awsglue.utils import getResolvedOptions
+from pyspark.sql import Row, Window, DataFrame
+from pyspark.sql.functions import to_date, lit, when, split, col, date_format, dense_rank, desc, first, expr, current_timestamp, \
+    concat_ws, col, lag, lead, coalesce
+from pyspark.sql import functions as F
+from pyspark.sql.types import array, ArrayType, IntegerType, NullType, StringType, StructType, StructField, DateType
+from datetime import datetime as dt
+from datetime import date
+from pyspark import SparkContext
+from pyspark.sql import SQLContext
+from pyspark import SparkConf
+from pyspark.sql import SparkSession
+
+
+def config_init():
+    global spark
+    global glue_context
+    global source_bucket
+    global dest_bucket
+    global record_key_info
+    global record_key_role
+    global utcnow_value
+
+    args = getResolvedOptions(sys.argv, ['JOB_NAME', 'dest_bucket', 'source_bucket'])
+    source_bucket = args['source_bucket']
+    dest_bucket = args['dest_bucket']
+    record_key_info = "agre_index_id"
+    # record_key_role = "agre_index_id,ins_plcy_pty_role_cust_id,ins_plcy_pty_role_nm_txt,role_eff_dt"
+    record_key_role = "agre_index_id,ins_plcy_pty_role_cust_id,role_eff_dt,role_end_dt,plcy_term_id,snap_id,cust_party_addr_id,party_nm_id,dba_clnt_id,excl_drvr_ind,creat_event_id,ins_plcy_pty_role_nm_txt,scdy_role_nm_txt,sys_end_tstmp"
+    utcnow_value = dt.utcnow()
+    spark = SparkSession.builder \
+        .appName("agreindex") \
+        .config('spark.debug.maxToStringFields', 2000) \
+        .config("hive.metastore.client.factory.class",
+                "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory") \
+        .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer") \
+        .config('spark.sql.hive.convertMetastoreParquet=false') \
+        .config('spark.sql.parquet.outputTimestampType=TIMESTAMP_MICROS') \
+        .enableHiveSupport() \
+        .getOrCreate()
+    spark._jsc.hadoopConfiguration().set("fs.s3.canned.acl", "BucketOwnerFullControl")
+    glue_context = GlueContext(spark.sparkContext)
+    spark = glue_context.spark_session
+    job = Job(glue_context)
+    job.init(args['JOB_NAME'], args)
+
+    return spark, job, glue_context
+
+
+def dataframe_akar(akar_src_path):
+    akar_spark_frame = spark.read.parquet(akar_src_path)
+
+    # filter based on business line of code # check with seth and bishal on this logic
+    rank_filter_akar = akar_spark_frame.filter("BUSN_LINE_CD in ('A', 'F', 'L')"). \
+        drop_duplicates(). \
+        selectExpr("agre_index_id", "akar_sys_updt_tmprl_tstmp", "akar_sys_end_tmprl_tstmp", "akar_sys_extrt_tstmp",
+                   "BUSN_LINE_CD") \
+        .withColumn("rank", dense_rank(). \
+                    over(Window.partitionBy("agre_index_id"). \
+                         orderBy(desc("akar_sys_updt_tmprl_tstmp"),
+                                 desc("akar_sys_extrt_tstmp")))).filter("rank = 1")
+
+    return rank_filter_akar
+
+
+def dataframe_km42(km42_src_path):
+    km42_spark_frame = spark.read.parquet(km42_src_path)
+
+    df_km42 = km42_spark_frame.filter("BUSN_LINE_CD in ('A', 'F', 'L')" and "apa_chng_type_cd == 'U'"). \
+        drop_duplicates(). \
+        withColumn("rank", dense_rank(). \
+                   over(Window.partitionBy("agre_index_id", "apa_clnt_agre_id", "apa_car_num"). \
+                        orderBy(desc("apa_sys_upsrt_tstmp"),
+                                desc("apa_sys_extrt_tstmp")))).filter("rank = 1"). \
+        selectExpr("agre_index_id as agre_index_id_km42", "apa_clnt_agre_id", "apa_car_num", "apa_sys_upsrt_tstmp")
+
+    return df_km42
+
+
+def dataframe_km43(km43_src_path):
+    km43_spark_frame = spark.read.parquet(km43_src_path)
+
+    df_km43 = km43_spark_frame.filter("BUSN_LINE_CD in ('A', 'F', 'L')"). \
+        drop_duplicates(). \
+        selectExpr("agre_role_clnt_agre_id", "clnt_agre_role_cd", "CLNT_ID", "ROLE_EFF_DT",
+                   "ROLE_END_DT", "agre_role_chng_type_cd")
+
+    return df_km43
+
+
+def join_km42_km43(df_km42, df_km43):
+    df_join1 = df_km43.join(df_km42, df_km43.agre_role_clnt_agre_id == df_km42.apa_clnt_agre_id,
+                            how='inner').drop_duplicates()
+
+    return df_join1
+
+
+def result_set_akar_join(df_join1, rank_filter_akar):
+    result_set = df_join1.join(rank_filter_akar, df_join1.agre_index_id_km42 == rank_filter_akar.agre_index_id,
+                               how='inner'). \
+        selectExpr("agre_index_id", "clnt_agre_role_cd", "CLNT_ID",
+                   "ROLE_EFF_DT", "ROLE_END_DT", "BUSN_LINE_CD", "agre_role_chng_type_cd","apa_car_num","apa_sys_upsrt_tstmp"
+                   ).drop_duplicates()
+
+    return result_set
+
+
+def find_car_type(inDF):
+    """
+    :param inDF:
+    :return: returns a data frame which  has below columns that
+    signifies if the car_type is single, multi or Fleet car ( S,M,F)
+         root
+     |-- agre_index_id: decimal(11,0) (nullable = true)
+     |-- BUSN_LINE_CD: string (nullable = true)
+     |-- car_type: string (nullable = false)
+    """
+
+    fleet_car_df = inDF.filter("BUSN_LINE_CD in ('A')") \
+        .filter("apa_car_num = '9ZZ'") \
+        .select("agre_index_id", "BUSN_LINE_CD") \
+        .withColumn("car_type", lit("F")).drop_duplicates()
+
+    single_car_df = inDF.filter("BUSN_LINE_CD in ('A')") \
+        .groupBy("agre_index_id", "BUSN_LINE_CD").count() \
+        .filter("count == 1") \
+        .withColumn("car_type", lit("S")) \
+        .drop("count").drop_duplicates()
+
+    multi_car_df = inDF.filter("BUSN_LINE_CD in ('A')") \
+        .join(fleet_car_df, on="agre_index_id", how="leftanti") \
+        .join(single_car_df, on="agre_index_id", how="leftanti").select("agre_index_id", "BUSN_LINE_CD") \
+        .withColumn("car_type", lit("M")).drop_duplicates()
+
+    non_car_type_df = inDF.filter("BUSN_LINE_CD in ('F','L')").select("agre_index_id", "BUSN_LINE_CD") \
+        .withColumn("car_type", lit(None)).drop_duplicates()
+
+    resultset_car_type_df = fleet_car_df.union(single_car_df) \
+        .union(multi_car_df) \
+        .union(non_car_type_df) \
+        .withColumnRenamed('BUSN_LINE_CD', 'BUSN_LINE_CD_NEW')\
+        .select("agre_index_id", "BUSN_LINE_CD_NEW", "car_type")
+
+    return resultset_car_type_df
+
+def add_car_type_resultset(org_resultset, car_type_df):
+    resultset_with_cartype_df = org_resultset.join(car_type_df, on='agre_index_id', how="inner")
+    return resultset_with_cartype_df
+
+
+def pit_ent_agre(input_df1):
+    print("inside pit_ent_agre ")
+
+    pit_ent_agre_df = input_df1.selectExpr("agre_index_id", "BUSN_LINE_CD", "agre_role_chng_type_cd") \
+        .withColumnRenamed("BUSN_LINE_CD", "busn_line_nm") \
+        .withColumn("prod_ctgry_nm", lit(None).cast(StringType())) \
+        .withColumn("prod_nm", lit(None).cast(StringType())) \
+        .withColumn("busn_line_nm",
+                    expr("case when busn_line_nm = 'A' then 'Auto' " +
+                         "when busn_line_nm = 'F' then 'Fire' " +
+                         "when busn_line_nm = 'L' then 'Life' "
+                         "else 'Unknown' end")).drop_duplicates()
+
+    return pit_ent_agre_df
+
+
+def pit_ent_agre_role(input_df1):
+    print("inside  pit_ent_agre_role")
+
+    df1 = input_df1.selectExpr("agre_index_id","CLNT_ID","clnt_agre_role_cd","ROLE_EFF_DT","ROLE_END_DT","agre_role_chng_type_cd")
+
+    pit_enprs_agre_role_df = df1.withColumn("plcy_term_id", lit(None).cast(StringType())) \
+        .withColumn("snap_id", lit(None).cast(StringType())) \
+        .withColumn("cust_party_addr_id", lit(None).cast(StringType())) \
+        .withColumn("party_nm_id", lit(None).cast(StringType())) \
+        .withColumn("dba_clnt_id", lit(None).cast(StringType())) \
+        .withColumn("excl_drvr_ind", lit(None).cast(StringType())) \
+        .withColumn("creat_event_id", lit(None).cast(StringType())) \
+        .withColumn("ins_plcy_pty_role_nm_txt", col("clnt_agre_role_cd")) \
+        .withColumn("scdy_role_nm_txt", col("clnt_agre_role_cd")) \
+        .withColumn("ins_plcy_pty_role_nm_txt",
+                    expr(
+                        "case when ins_plcy_pty_role_nm_txt = 'PNI' then 'NamedInsured' " +
+                        "when ins_plcy_pty_role_nm_txt = 'ANI' then 'NamedInsured' " +
+                        "when ins_plcy_pty_role_nm_txt = 'PPO' then 'PolicyOwner' " +
+                        "when ins_plcy_pty_role_nm_txt = 'APO' then 'PolicyOwner' " +
+                        "when ins_plcy_pty_role_nm_txt = 'PAR' then 'AdverseRisk' " +
+                        "when ins_plcy_pty_role_nm_txt = 'AAR' then 'AdverseRisk' " +
+                        "else 'Unknown' end")) \
+        .withColumn("scdy_role_nm_txt",
+                    expr("case when scdy_role_nm_txt = 'PNI' then 'Primary' " +
+                         "when scdy_role_nm_txt = 'ANI' then 'Additional' " +
+                         "when scdy_role_nm_txt = 'PPO' then 'Primary' " +
+                         "when scdy_role_nm_txt = 'APO' then 'Additional' " +
+                         "when scdy_role_nm_txt = 'PAR' then 'Primary' " +
+                         "when scdy_role_nm_txt = 'AAR' then 'Additional' " +
+                         "else 'Unknown' end")) \
+        .withColumnRenamed("ROLE_END_DT", "role_end_dt") \
+        .withColumn("role_end_dt", F.when(col("role_end_dt").isNull(), to_date(lit('9999-12-31'),'yyyy-MM-dd')).otherwise(col("role_end_dt"))) \
+        .withColumnRenamed("CLNT_ID", "ins_plcy_pty_role_cust_id") \
+        .withColumnRenamed("ROLE_EFF_DT", "role_eff_dt") \
+        .drop("clnt_agre_role_cd").drop_duplicates()
+
+    return pit_enprs_agre_role_df
+
+
+def info_transform_write_hudi(input_info_view_df):
+    print("inside info_transform_write_hudi ")
+    info_view_df = input_info_view_df.withColumn("upsrt_tstamp", lit(utcnow_value)) \
+        .withColumn('partition', col("agre_index_id").substr(-3, 3))
+    return info_view_df
+
+
+def role_transform_write_hudi(input_role_view_df):
+    print("inside role_transform_write_hudi ")
+    role_view_df = input_role_view_df.withColumn("upsrt_tstamp", lit(utcnow_value)) \
+        .withColumn("sys_end_tstmp", lit(dt.strptime('9999-12-31 00:00:00.000000', '%Y-%m-%d %H:%M:%S.%f'))) \
+        .withColumn('partition', col("agre_index_id").substr(-3, 3))
+    return role_view_df
+
+
+def create_current_info_df(input_path):  # replace with hudi read
+    print("inside create_current_info_df")
+    df = spark.read.format("hudi").load(input_path + '/*')
+    info_df = df.drop("_hoodie_commit_time", "_hoodie_commit_seqno", "_hoodie_record_key", "_hoodie_partition_path",
+                      "_hoodie_file_name", "upsrt_tstamp", "partition")
+    return info_df
+
+
+def create_current_role_df(input_path):  # replace with hudi read
+    print("inside create_current_role_df ")
+    df = spark.read.format("hudi").load(input_path + '/*')
+    role_df = df.drop("_hoodie_commit_time", "_hoodie_commit_seqno", "_hoodie_record_key", "_hoodie_partition_path",
+                      "_hoodie_file_name", "upsrt_tstamp", "sys_end_tstmp", "partition")
+    return role_df
+
+def find_new_updated_rows(new_df, current_df):
+    print("inside find_new_updated_rows")
+
+    new_without_chng_type = new_df.columns
+    new_without_chng_type.remove('agre_role_chng_type_cd')
+    curr_without_chng_type = new_df.columns
+    curr_without_chng_type.remove('agre_role_chng_type_cd')
+    df1 = new_df.withColumn("hash_value", F.hash(concat_ws('_', *new_without_chng_type)))
+    df2 = current_df.withColumn("hash_value", F.hash(concat_ws('_', *curr_without_chng_type)))
+    delta_df = df1.join(df2, on='hash_value', how='leftanti')
+
+    return delta_df
+
+
+def compare_new_existing_info_view(new_pit_ent_agre_df, existing_pit_ent_agre_df, new_pit_ent_agre_role_df):
+    print("inside compare_new_existing_info_view")
+    new_rows_pit_ent_agre = new_pit_ent_agre_df.join(existing_pit_ent_agre_df, on='agre_index_id',
+                                                     how='leftanti').filter(col("agre_index_id") > 0)
+
+
+    if not new_rows_pit_ent_agre.rdd.isEmpty():
+        print("found new pit_ent_agre - writing to the agre info view  ")
+
+        # need to drop agre role change type cd and drop duplicates.
+        new_rows_pit_ent_agre = info_transform_write_hudi(new_rows_pit_ent_agre).drop(
+            "agre_role_chng_type_cd").drop_duplicates()
+        write_hudi(new_rows_pit_ent_agre, "pit_ent_agre", dest_bucket, record_key_info, 'upsert')
+
+        print("found new pit_ent_agre - writing to the agre Role  view  ")
+
+        new_rows_pit_ent_agre_role_df = new_pit_ent_agre_role_df.join(new_rows_pit_ent_agre.select("agre_index_id"),
+                                                                      on='agre_index_id',
+                                                                      how='leftsemi')
+
+        new_rows_pit_ent_agre_role_df = role_transform_write_hudi(new_rows_pit_ent_agre_role_df).drop(
+            "agre_role_chng_type_cd").drop_duplicates()
+        write_hudi(new_rows_pit_ent_agre_role_df, "pit_enprs_agre_role", dest_bucket, record_key_role, 'upsert')
+    else:
+        print("Nothing to write")
+
+
+def compare_new_existing_role_view(rows_in_new_view_df, existing_pit_ent_agre_role_df):
+    print("inside compare_new_existing_role_view")
+    new_rows_pit_ent_agre_role_matched = rows_in_new_view_df.join(existing_pit_ent_agre_role_df,
+                                                                  on='agre_index_id' and 'ins_plcy_pty_role_cust_id' and 'ins_plcy_pty_role_nm_txt' and 'role_eff_dt' and 'scdy_role_nm_txt',
+                                                                  how='leftsemi')
+
+    prior_rows_pit_ent_agre_role_matched = existing_pit_ent_agre_role_df.join(rows_in_new_view_df,
+                                                                              on='agre_index_id' and 'ins_plcy_pty_role_cust_id' and 'ins_plcy_pty_role_nm_txt' and 'role_eff_dt' and 'scdy_role_nm_txt',
+                                                                              how='leftsemi')
+
+    new_rows_pit_ent_agre_role_not_matched = rows_in_new_view_df.join(existing_pit_ent_agre_role_df,
+                                                                      on='agre_index_id' and 'ins_plcy_pty_role_cust_id' and 'ins_plcy_pty_role_nm_txt' and 'role_eff_dt' and 'scdy_role_nm_txt',
+                                                                      how='leftanti')
+
+    prior_rows_pit_ent_agre_role_not_matched = existing_pit_ent_agre_role_df.join(rows_in_new_view_df,
+                                                                                  on='agre_index_id' and 'ins_plcy_pty_role_cust_id' and 'ins_plcy_pty_role_nm_txt' and 'role_eff_dt' and 'scdy_role_nm_txt',
+                                                                                  how='leftanti')
+
+    if not new_rows_pit_ent_agre_role_matched.rdd.isEmpty():
+        evaluate_change_type_yes(new_rows_pit_ent_agre_role_matched, prior_rows_pit_ent_agre_role_matched)
+
+    if not new_rows_pit_ent_agre_role_not_matched.rdd.isEmpty:
+        evaluate_change_type_no(new_rows_pit_ent_agre_role_matched, prior_rows_pit_ent_agre_role_not_matched)
+
+
+
+def evaluate_change_type_yes(new_rows_pit_ent_agre_role_matched, prior_rows_pit_ent_agre_role_matched):
+    print("inside evaluate_change_type_yes")
+
+    write_hudi(new_rows_pit_ent_agre_role_matched
+               .filter("agre_role_chng_type_cd in ('U')")
+               .drop("agre_role_chng_type_cd")
+               .withColumn("upsrt_tstamp", lit(utcnow_value))
+               .withColumn('partition', col("agre_index_id").substr(-3, 3))
+               .drop_duplicates(),
+               "pit_enprs_agre_role", dest_bucket, record_key_role, 'upsert')
+    # add logic to delete row from role view
+    write_hudi(prior_rows_pit_ent_agre_role_matched
+               .filter("agre_role_chng_type_cd in ('U')")
+               .drop("agre_role_chng_type_cd")
+               .withColumn('partition', col("agre_index_id").substr(-3, 3))
+               .drop_duplicates(),
+               "pit_enprs_agre_role", dest_bucket, record_key_role, 'delete')
+
+    # set sys_end_tstmp to current value
+    write_hudi(new_rows_pit_ent_agre_role_matched
+               .filter("agre_role_chng_type_cd in ('D')")
+               .drop("agre_role_chng_type_cd")
+               .withColumn("upsrt_tstamp", lit(utcnow_value))
+               .withColumn("sys_end_tstmp", lit(utcnow_value))
+               .withColumn('partition', col("agre_index_id").substr(-3, 3))
+               .drop_duplicates(),
+               "pit_enprs_agre_role", dest_bucket, record_key_role, 'upsert')
+
+    # add logic to delete row from role view
+    write_hudi(prior_rows_pit_ent_agre_role_matched
+               .filter("agre_role_chng_type_cd in ('D')")
+               .drop("agre_role_chng_type_cd")
+               .withColumn('partition', col("agre_index_id").substr(-3, 3))
+               .drop_duplicates(),
+               "pit_enprs_agre_role", dest_bucket, record_key_role, 'delete')
+
+
+def evaluate_change_type_no(new_rows_pit_ent_agre_role_matched, prior_rows_pit_ent_agre_role_matched):
+    print("inside evaluate_change_type_no")
+
+    write_hudi(new_rows_pit_ent_agre_role_matched
+               .filter("agre_role_chng_type_cd in ('U')")
+               .drop("agre_role_chng_type_cd")
+               .withColumn("upsrt_tstamp", lit(utcnow_value))
+               .withColumn('partition', col("agre_index_id").substr(-3, 3))
+               .drop_duplicates(),
+               "pit_enprs_agre_role", dest_bucket, record_key_role, 'upsert')
+
+    write_hudi(new_rows_pit_ent_agre_role_matched
+               .filter("agre_role_chng_type_cd in ('D')")
+               .drop("agre_role_chng_type_cd")
+               .withColumn("upsrt_tstamp", lit(utcnow_value))
+               .withColumn('partition', col("agre_index_id").substr(-3, 3))
+               .drop_duplicates(),
+               "pit_enprs_agre_role_error", dest_bucket, record_key_role, 'upsert')
+
+    # add logic to delete row from role view
+
+
+def write_hudi(input_df,
+               tableName,
+               output_bucket,
+               record_key,
+               oper,
+               dbName='agre-role-db',
+               partitionKey='partition',
+               precombine_field='upsrt_tstamp'):
+    print("inside  write_hudi")
+    targetPath = 's3a://' + output_bucket + '/' + dbName + '/' + tableName
+
+    commonConfig = {'className': 'org.apache.hudi',
+                    'hoodie.datasource.hive_sync.use_jdbc': 'false',
+                    'hoodie.datasource.write.precombine.field': precombine_field,
+                    'hoodie.datasource.write.table.type': 'COPY_ON_WRITE',
+                    "hoodie.datasource.write.hive_style_partitioning": 'true',
+                    'hoodie.datasource.write.recordkey.field': record_key,
+                    'hoodie.table.name': tableName,
+                    'hoodie.consistency.check.enabled': 'true',
+                    'hoodie.datasource.hive_sync.auto_create_database': 'true',
+                    'hoodie.datasource.hive_sync.database': dbName,
+                    'hoodie.datasource.hive_sync.table': tableName,
+                    'hoodie.datasource.hive_sync.enable': 'true',
+                    "hoodie.datasource.write.keygenerator.class": "org.apache.hudi.keygen.ComplexKeyGenerator"
+                    }
+
+    initLoadConfig = {'hoodie.bulkinsert.shuffle.parallelism': 3,
+                      'hoodie.datasource.write.operation': 'bulk_insert'}
+
+    partitionDataConfig = {'hoodie.datasource.write.partitionpath.field': partitionKey,
+                           'hoodie.datasource.hive_sync.partition_extractor_class': 'org.apache.hudi.hive.MultiPartKeysValueExtractor',
+                           'hoodie.datasource.hive_sync.partition_fields': partitionKey,
+                           'hoodie.datasource.hive_sync.support_timestamp': 'true'}
+
+    incrementalConfig = {'hoodie.upsert.shuffle.parallelism': 20,
+                         'hoodie.datasource.write.operation': 'upsert',
+                         'hoodie.cleaner.policy': 'KEEP_LATEST_COMMITS',
+                         'hoodie.cleaner.commits.retained': 15}
+
+    deleteDataConfig = {
+        'hoodie.datasource.write.payload.class': 'org.apache.hudi.common.model.EmptyHoodieRecordPayload'}
+
+    combinedConf_insert = {**commonConfig, **partitionDataConfig, **initLoadConfig}
+    combinedConf_upsert = {**commonConfig, **partitionDataConfig, **incrementalConfig}
+    combinedConf_delete = {**commonConfig, **partitionDataConfig, **incrementalConfig, **deleteDataConfig}
+    if oper == 'upsert':
+        input_df.write.format('org.apache.hudi').options(**combinedConf_upsert).mode('append').save(targetPath)
+    if oper == 'delete':
+        input_df.write.format('org.apache.hudi').options(**combinedConf_delete).mode('append').save(targetPath)
+
+
+
+#v3.1 code
+
+def get_potential_targetview(inDF):
+
+    w = Window().partitionBy("agre_index_id").orderBy(col("ins_plcy_pty_role_cust_id"))
+
+    df0 = inDF.select("*", lag("role_eff_dt").over(w).alias("temp_role_eff_dt"), lag("role_end_dt").over(w).alias("temp_role_end_dt"))
+
+    df1 = df0.select("*",coalesce(df0["temp_role_eff_dt"],df0["role_eff_dt"], lit('0').cast(DateType())).alias("temp_role_eff_dt1"),coalesce(df0["temp_role_end_dt"],df0["role_end_dt"],lit('0').cast(DateType())).alias("temp_role_end_dt1"))
+
+    df2 = df1.select("agre_index_id","ins_plcy_pty_role_cust_id","ins_plcy_pty_role_nm_txt","scdy_role_nm_txt","plcy_term_id","snap_id","cust_party_addr_id","party_nm_id","dba_clnt_id","excl_drvr_ind","creat_event_id","agre_role_chng_type_cd",when((df1.temp_role_eff_dt1 <= df1.role_eff_dt) & (df1.role_eff_dt <= df1.temp_role_end_dt1),df1.temp_role_eff_dt1).otherwise(df1.role_eff_dt).alias("role_eff_dt"),when((df1.temp_role_eff_dt1 <= df1.role_end_dt) & (df1.role_end_dt <= df1.temp_role_end_dt1), df1.temp_role_end_dt1).otherwise(df1.role_end_dt).alias("role_end_dt")).drop_duplicates()
+
+    ranked = df2.withColumn("rank",dense_rank().over(Window.partitionBy("agre_index_id","ins_plcy_pty_role_cust_id","ins_plcy_pty_role_nm_txt","scdy_role_nm_txt","role_eff_dt").orderBy(desc("role_end_dt"))))
+
+    df_final = ranked.filter(ranked.rank==1).drop("rank")
+
+    return df_final
+
+def multicar_etl_logic(inDF):
+
+    print("Executing MultiCar ETL Logic")
+
+    resultset_pni = inDF.filter("clnt_agre_role_cd = 'PNI'")
+    resultset_ani = inDF.filter("clnt_agre_role_cd = 'ANI'")
+
+
+    transform_resultset_pni = resultset_pni.withColumn("rank", dense_rank().over(
+                Window.partitionBy("agre_index_id","clnt_agre_role_cd").orderBy("CLNT_ID"))) \
+                .sort(F.col("ROLE_EFF_DT").asc(),
+                        F.col("role_end_dt").desc()) \
+                            .withColumn("role_end_dt", F.when(col("role_end_dt").isNull(), to_date(lit('9999-12-31'),'yyyy-MM-dd')).otherwise(col("role_end_dt")))
+
+    transform_resultset_ani = resultset_ani.withColumn("rank", dense_rank().over(
+                    Window.partitionBy("agre_index_id","clnt_agre_role_cd").orderBy("CLNT_ID"))) \
+                    .sort(F.col("ROLE_EFF_DT").asc(),
+                            F.col("role_end_dt").desc()) \
+                                .withColumn("role_end_dt", F.when(col("role_end_dt").isNull(), to_date(lit('9999-12-31'),'yyyy-MM-dd')).otherwise(col("role_end_dt")))
+
+
+    pit_agre_role_pni = pit_ent_agre_role(transform_resultset_pni)
+    pit_agre_role_ani = pit_ent_agre_role(transform_resultset_ani)
+
+    print("Creating Potential Target view")
+
+    potentialview_pni = get_potential_targetview(pit_agre_role_pni)
+    potentialview_ani = get_potential_targetview(pit_agre_role_ani)
+
+    print("Writing Potential Target view")
+
+    #write df pni role view
+
+    pni_rows_pit_ent_agre_role_df = role_transform_write_hudi(potentialview_pni).drop_duplicates()
+    write_hudi(pni_rows_pit_ent_agre_role_df, "pit_enprs_agre_role", dest_bucket, record_key_role, 'upsert')
+
+    #write df ani role view
+
+    ani_rows_pit_ent_agre_role_df = role_transform_write_hudi(potentialview_ani).drop_duplicates()
+    write_hudi(ani_rows_pit_ent_agre_role_df, "pit_enprs_agre_role", dest_bucket, record_key_role, 'upsert')
+
+
+def fleet_etl_logic(fleet_inDF):
+
+    print("Executing Fleet ETL Logic")
+
+    #writing fleet data to info view
+    inDF = fleet_inDF.filter("apa_car_num = '9ZZ'")
+
+    pit_ent_agre_new_df = pit_ent_agre(inDF)
+    rows_pit_ent_agre = info_transform_write_hudi(pit_ent_agre_new_df).drop(
+                "agre_role_chng_type_cd").drop_duplicates()
+    write_hudi(rows_pit_ent_agre, "pit_ent_agre", dest_bucket, record_key_info, 'upsert')
+
+    #writing fleet data to role view
+    pit_enprs_agre_role_new_df = pit_ent_agre_role(inDF)
+    rows_pit_ent_agre_role_df = role_transform_write_hudi(pit_enprs_agre_role_new_df).drop(
+                "agre_role_chng_type_cd").drop_duplicates()
+    write_hudi(rows_pit_ent_agre_role_df, "pit_enprs_agre_role", dest_bucket, record_key_role, 'upsert')
+
+    print("Writing complete for Fleet Data")
+
+
+def singlecar_etl_logic(result_set):
+
+    try:
+        global pit_ent_agre_current_df
+        global pit_ent_agre_new_df
+        pit_ent_agre_current_df = create_current_info_df(
+            #'s3://sf-datalake1-test2-use1-conformed/pc/autofire/sys2/legacyagreementroles/agre-role-db/pit_ent_agre/*')
+            's3://sf-pcingest-test1-use1-agre-role-view-legacy/agre-role-db/pit_ent_agre/*')
+        pit_ent_agre_new_df = pit_ent_agre(result_set)
+
+
+    except:
+
+        schema = StructType([
+            StructField('col0', StringType(), True),
+            StructField('col1', StringType(), True),
+            StructField('col2', StringType(), True)
+        ])
+
+        # create empty dataframe
+        pit_ent_agre_current_df = spark.createDataFrame(spark.sparkContext.emptyRDD(), schema)
+
+        print("creating init info view")
+        pit_ent_agre_new_df = pit_ent_agre(result_set)
+        info_transform_write_hudi_df = info_transform_write_hudi(pit_ent_agre_new_df).drop(
+            "agre_role_chng_type_cd").drop_duplicates()
+        write_hudi(info_transform_write_hudi_df, "pit_ent_agre", dest_bucket, record_key_info, 'upsert')
+
+    try:
+        global pit_enprs_agre_role_current_df
+        global pit_enprs_agre_role_new_df
+        pit_enprs_agre_role_current_df = create_current_role_df(
+            #'s3://sf-datalake1-test2-use1-conformed/pc/autofire/sys2/legacyagreementroles/agre-role-db/pit_enprs_agre_role/*')
+            's3://sf-pcingest-test1-use1-agre-role-view-legacy/agre-role-db/pit_enprs_agre_role/*')
+        pit_enprs_agre_role_new_df = pit_ent_agre_role(result_set)
+    except:
+        schema = StructType([
+            StructField('col0', StringType(), True),
+            StructField('col1', StringType(), True),
+            StructField('col2', StringType(), True)
+        ])
+        # create empty dataframe
+        pit_enprs_agre_role_current_df = spark.createDataFrame(spark.sparkContext.emptyRDD(), schema)
+
+        print("creating init role view")
+        pit_enprs_agre_role_new_df = pit_ent_agre_role(result_set)
+        role_transform_write_hudi_df = role_transform_write_hudi(pit_enprs_agre_role_new_df).drop(
+            "agre_role_chng_type_cd").drop_duplicates()
+        write_hudi(role_transform_write_hudi_df, "pit_enprs_agre_role", dest_bucket, record_key_role, 'upsert')
+
+    if not pit_ent_agre_current_df.rdd.isEmpty() and not pit_enprs_agre_role_current_df.rdd.isEmpty():
+
+        new_updated_rows_agre_info = find_new_updated_rows(pit_ent_agre_new_df,
+                                                           pit_ent_agre_current_df)
+        new_updated_rows_agre_role = find_new_updated_rows(pit_enprs_agre_role_new_df,
+                                                           pit_enprs_agre_role_current_df)
+
+        print("comparing views")
+        if not new_updated_rows_agre_info.rdd.isEmpty() or not new_updated_rows_agre_role.rdd.isEmpty():
+            compare_new_existing_info_view(new_updated_rows_agre_info.drop("hash_value"), pit_ent_agre_current_df,
+                                           new_updated_rows_agre_role.drop("hash_value"))
+
+            compare_new_existing_role_view(new_updated_rows_agre_role.drop("hash_value"),
+                                           pit_enprs_agre_role_current_df)
+
+
+def main():
+    print("start of main method")
+    spark, job, glue_context = config_init()
+
+    km42_src_path = "s3a://" + source_bucket + "/agre-index/devint/eaka/V1/"
+    km43_src_path = "s3a://" + source_bucket + "/agre-index/devint/km43/V1/"
+    akar_src_path = "s3a://" + source_bucket + "/agre-index/devint/akar/V1/"
+
+    result_set = result_set_akar_join(join_km42_km43(dataframe_km42(km42_src_path), dataframe_km43(km43_src_path)),
+                                      dataframe_akar(akar_src_path)).drop_duplicates()
+
+    resultset_car_type_df = find_car_type(result_set)
+    resultset_with_cartype_df = add_car_type_resultset(result_set,resultset_car_type_df)
+
+    single_car_resultset = resultset_with_cartype_df.filter("car_type = 'S'")
+    multi_car_resultset = resultset_with_cartype_df.filter("car_type = 'M'")
+    fleet_car_resultset= resultset_with_cartype_df.filter("car_type = 'F'")
+
+    #v2.0 ETL logic for single car
+    singlecar_etl_logic(single_car_resultset)
+
+    #v3.0 v3.1 logic for multi car
+    fleet_etl_logic(fleet_car_resultset)
+
+    multicar_etl_logic(multi_car_resultset)
+
+    print("end of main method ")
+
+    job.commit()
+    spark.stop()
+
+
+if __name__ == "__main__":
+    main()
