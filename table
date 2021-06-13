@@ -1,0 +1,527 @@
+Atomic Structure Comparison		
+Difference between FDW and EIDC atomic table structure is OFF_CD .  Dropped OFF_CD in EIDC.		
+		
+FDW Atomic Table structure	EIDC Atomic Table Structure	
+FDWATOMCSHOP.NRTVE_INFO	euirltnh_raw.nrtve_info	
+NRTVE_ID CHAR(11 OCTETS) NOT NULL DEFAULT '', 	nrtve_id	char(11)
+NRTVE_SRC_CD CHAR(1 OCTETS) NOT NULL DEFAULT '', 	nrtve_src_cd	char(1)
+NRTVE_SEQ_NUM SMALLINT NOT NULL, 	nrtve_seq_num	smallint
+NRTVE_CLAS_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 	nrtve_clas_cd	char(2)
+NRTVE_MSG_CD CHAR(5 OCTETS) NOT NULL DEFAULT ' ', 	nrtve_msg_cd	char(5)
+NRTVE_REMK_TXT CHAR(90 OCTETS) NOT NULL DEFAULT ' ', 	nrtve_remk_txt	char(90)
+NRTVE_REMK_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 	nrtve_remk_cd	char(2)
+NRTVE_SECT_CD CHAR(5 OCTETS) NOT NULL DEFAULT ' ', 	nrtve_sect_cd	char(5)
+PKG_NUM CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	pkg_num	char(3)
+SEQ_NUM CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	seq_num	char(3)
+NRTVE_SRC_SEQ_NUM SMALLINT NOT NULL DEFAULT 0, 	nrtve_src_seq_num	smallint
+OFF_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 		
+FDW_INSRT_TSTMP TIMESTAMP NOT NULL DEFAULT CURRENT TIMESTAMP	insrt_tstmp	timestamp
+		
+		
+FDWATOMCSHOP.DRLIC_CLAS_INFO	euirltnh_raw.drlic_clas_info	
+DRVR_LICNS_ID CHAR(11 OCTETS) NOT NULL, 	drvr_licns_id	char(11)
+DRVR_LICNS_CLAS_ID SMALLINT NOT NULL, 	drvr_licns_clas_id	smallint
+DRVR_LICNS_CLAS_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	drvr_licns_clas_cd	char(1)
+DRVR_LICNS_CLAS_DESC_TXT CHAR(19 OCTETS) NOT NULL DEFAULT ' ', 	drvr_licns_clas_desc_txt	char(19)
+DRVR_LICNS_EXP_DT CHAR(8 OCTETS) NOT NULL DEFAULT ' ', 	drvr_licns_exp_dt	char(8)
+DRVR_LICNS_ISS_DT CHAR(8 OCTETS) NOT NULL DEFAULT ' ', 	drvr_licns_iss_dt	char(8)
+DRVR_LICNS_STTS_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	drvr_licns_stts_cd	char(1)
+DRVR_LICNS_STTS_DESC_TXT CHAR(22 OCTETS) NOT NULL DEFAULT ' ', 	drvr_licns_stts_desc_txt	char(22)
+DMV_ACCT_NUM CHAR(14 OCTETS) NOT NULL DEFAULT ' ', 	dmv_acct_num	char(14)
+DRV_RSTRC_EXPLN_TXT CHAR(23 OCTETS) NOT NULL DEFAULT ' ', 	drv_rstrc_expln_txt	char(23)
+MVR_RQST_NM CHAR(50 OCTETS) NOT NULL DEFAULT ' ', 	mvr_rqst_nm	char(50)
+PKG_NUM CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	pkg_num	char(3)
+SEQ_NUM CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	seq_num	char(3)
+OFF_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 		
+FDW_INSRT_TSTMP TIMESTAMP NOT NULL DEFAULT CURRENT TIMESTAMP	insrt_tstmp	timestamp
+		
+		
+FDWATOMCSHOP.DRLIC_HSTRY_INFO	euirltnh_raw.drlic_hstry_info	
+DRVR_LICNS_ID CHAR(11 OCTETS) NOT NULL, 	drvr_licns_id	char(11)
+DRVR_LICNS_HSTRY_ID SMALLINT NOT NULL, 	drvr_licns_hstry_id	smallint
+DMV_DRV_RCRD_TXT CHAR(50 OCTETS) NOT NULL DEFAULT ' ', 	dmv_drv_rcrd_txt	char(50)
+DMV_VIOL_CD CHAR(10 OCTETS) NOT NULL DEFAULT ' ', 	dmv_viol_cd	char(10)
+DMV_PNT_CD CHAR(6 OCTETS) NOT NULL DEFAULT ' ', 	dmv_pnt_cd	char(6)
+INCDT_RESOL_DT CHAR(8 OCTETS) NOT NULL DEFAULT ' ', 	incdt_resol_dt	char(8)
+INCDT_DT CHAR(8 OCTETS) NOT NULL DEFAULT ' ', 	incdt_dt	char(8)
+INCDT_TYPE_CD CHAR(4 OCTETS) NOT NULL DEFAULT ' ', 	incdt_type_cd	char(4)
+PKG_NUM CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	pkg_num	char(3)
+SEQ_NUM CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	seq_num	char(3)
+STD_VIOL_CD CHAR(10 OCTETS) NOT NULL DEFAULT ' ', 	std_viol_cd	char(10)
+INCDT_OFFST_CD CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	incdt_offst_cd	char(3)
+INCDT_RESOL_OFF_CD CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	incdt_resol_off_cd	char(3)
+OFF_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 		
+FDW_INSRT_TSTMP TIMESTAMP NOT NULL DEFAULT CURRENT TIMESTAMP	insrt_tstmp	timestamp
+		
+		
+FDWATOMCSHOP.HHLD_NON_CR_DETL	euirltnh_raw.hhld_non_cr_detl	
+HHLD_NON_CR_DET_ID CHAR(11 OCTETS) NOT NULL, 	hhld_non_cr_det_id	char(11)
+PROD_ORD_ID CHAR(11 OCTETS) NOT NULL, 	prod_ord_id	char(11)
+HHLD_MEMBR_CNT SMALLINT NOT NULL DEFAULT 0, 	hhld_membr_cnt	smallint
+HHLD_DRVR_CNT SMALLINT NOT NULL DEFAULT 0, 	hhld_drvr_cnt	smallint
+HHLD_RGLR_DRV_CNT SMALLINT NOT NULL DEFAULT 0, 	hhld_rglr_drv_cnt	smallint
+HHLD_UMBRL_PLC_IND CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	hhld_umbrl_plc_ind	char(1)
+NON_CR_UNDWR_S_NUM CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	non_cr_undwr_s_num	char(3)
+NON_CR_RATE_SC_NUM CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	non_cr_rate_sc_num	char(3)
+SRC_ADD_TSTMP TIMESTAMP NOT NULL, 	src_add_tstmp	timestamp
+SRC_UPDT_TSTMP TIMESTAMP, 	src_updt_tstmp	timestamp
+OFF_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 		
+FDW_INSRT_TSTMP TIMESTAMP NOT NULL DEFAULT CURRENT TIMESTAMP	insrt_tstmp	timestamp
+		
+		
+FDWATOMCSHOP.PROD_ADJST	euirltnh_raw.prod_adjst	
+PROD_ORD_ID CHAR(11 OCTETS) NOT NULL, 	prod_ord_id	char(11)
+PROD_RQST_ID CHAR(11 OCTETS) NOT NULL, 	prod_rqst_id	char(11)
+ADJST_INSRT_SEQ_ID SMALLINT NOT NULL, 	adjst_insrt_seq_id	smallint
+PROD_ADJST_ID SMALLINT NOT NULL, 	prod_adjst_id	smallint
+ADD_TEAM_MEMBR_ID CHAR(4 OCTETS) NOT NULL DEFAULT ' ', 	add_team_membr_id	char(4)
+PROD_ADJST_I_TSTMP TIMESTAMP NOT NULL DEFAULT CURRENT TIMESTAMP, 	prod_adjst_i_tstmp	timestamp
+PROD_ADJST_VARB_NM VARCHAR(50 OCTETS) NOT NULL, 	prod_adjst_varb_nm	char(50)
+OFF_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 		
+FDW_INSRT_TSTMP TIMESTAMP NOT NULL DEFAULT CURRENT TIMESTAMP, 	insrt_tstmp	timestamp
+ADD_TEAM_MEMBR_8_ID CHAR(8 OCTETS) NOT NULL DEFAULT ' '	add_team_membr_8_id	char(8)
+		
+		
+FDWATOMCSHOP.PROD_ORD_MODEL_EXECN_RLTN	euirltnh_raw.prod_ord_model_execn_rltn	
+MODEL_EXECN_ID BIGINT NOT NULL, 	model_execn_id	bigint
+PROD_ORD_ID CHAR(11 OCTETS) NOT NULL, 	prod_ord_id	char(11)
+PROD_RQST_ID CHAR(11 OCTETS) NOT NULL, 	prod_rqst_id	char(11)
+OFF_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 		
+FDW_INSRT_TSTMP TIMESTAMP NOT NULL DEFAULT CURRENT TIMESTAMP	insrt_tstmp	timestamp
+		
+		
+FDWATOMCSHOP.PROD_RQST_CORRL	 euirltnh_raw.prod_rqst_corrl	
+CORRL_ID" CHAR(45 OCTETS) NOT NULL, 	corrl_id	char(45)
+PROD_RQST_ID" CHAR(11 OCTETS) NOT NULL, 	prod_rqst_id	char(11)
+OFF_CD" CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 		
+FDW_INSRT_TSTMP" TIMESTAMP NOT NULL DEFAULT CURRENT TIMESTAMP	insrt_tstmp	timestamp
+		
+		
+FDWATOMCSHOP.VEH_NON_CR_DETL	euirltnh_raw.veh_non_cr_detl	
+HHLD_NON_CR_DET_ID" CHAR(11 OCTETS) NOT NULL, 	hhld_non_cr_det_id	char(11)
+VEH_SEQ_NUM" SMALLINT NOT NULL, 	veh_seq_num	smallint
+VEH_PRIOR_CRRR_CD" CHAR(5 OCTETS) NOT NULL DEFAULT ' ', 	veh_prior_crrr_cd	char(5)
+VEH_PRIOR_CRRR_TTL_MO_CNT" SMALLINT NOT NULL DEFAULT 0, 	veh_prior_crrr_ttl_mo_cnt	smallint
+VEH_PRIOR_CRRR_UPER_BI_AMT" DECIMAL(11 , 2) NOT NULL DEFAULT 0.0, 	veh_prior_crrr_uper_bi_amt	decimal(11,2)
+VEH_PRIOR_CRRR_CD_IND" CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	veh_prior_crrr_cd_ind	char(1)
+VEH_PRIOR_CRRR_TTL_MO_CNT_IND" CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	veh_prior_crrr_ttl_mo_cnt_ind	char(1)
+VEH_PRIOR_CRRR_UPER_BI_AMT_IND" CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	veh_prior_crrr_uper_bi_amt_ind	char(1)
+OFF_CD" CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 		
+FDW_INSRT_TSTMP" TIMESTAMP NOT NULL DEFAULT CURRENT TIMESTAMP	insrt_tstmp	timestamp
+		
+		
+FDWATOMCSHOP.ADDR_INFO	 euirltnh_raw.addr_info	
+ADDR_ID CHAR(11 OCTETS) NOT NULL DEFAULT '', 	addr_id	char(11)
+SUBJ_ID CHAR(11 OCTETS) NOT NULL DEFAULT '', 	subj_id	char(11)
+PROD_ORD_ID CHAR(11 OCTETS) NOT NULL DEFAULT '', 	prod_ord_id	char(11)
+CLM_ID CHAR(11 OCTETS) NOT NULL DEFAULT '', 	clm_id	char(11)
+ADDR_TYPE_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	addr_type_cd	char(1)
+ADDR_TYPE_MTCH_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	addr_type_mtch_cd	char(1)
+ADDR_OWNSP_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	addr_ownsp_cd	char(1)
+APT_NUM CHAR(7 OCTETS) NOT NULL DEFAULT ' ', 	apt_num	char(7)
+APT_NUM_MTCH_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	apt_num_mtch_cd	char(1)
+CITY_NM CHAR(20 OCTETS) NOT NULL DEFAULT ' ', 	city_nm	char(20)
+CITY_MTCH_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	city_mtch_cd	char(1)
+CNTY_NM CHAR(20 OCTETS) NOT NULL DEFAULT ' ', 	cnty_nm	char(20)
+HOUS_NUM CHAR(10 OCTETS) NOT NULL DEFAULT ' ', 	hous_num	char(10)
+HOUS_NUM_MTCH_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	hous_num_mtch_cd	char(1)
+PKG_IND CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	pkg_ind	char(1)
+PKG_NUM CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	pkg_num	char(3)
+POSTL_ST_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 	postl_st_cd	char(2)
+POSTL_ST_MTCH_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	postl_st_mtch_cd	char(1)
+SEQ_NUM CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	seq_num	char(3)
+SF_ORIGN_IND CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	sf_orign_ind	char(1)
+STRET_NM CHAR(42 OCTETS) NOT NULL DEFAULT ' ', 	stret_nm	char(42)
+STRET_MTCH_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	stret_mtch_cd	char(1)
+SUBJ_ADDR_FINAL_DT CHAR(8 OCTETS) NOT NULL DEFAULT ' ', 	subj_addr_final_dt	char(8)
+SUBJ_ADDR_INIT_DT CHAR(8 OCTETS) NOT NULL DEFAULT ' ', 	subj_addr_init_dt	char(8)
+SUBJ_ADDR_TIME_YR_NM CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 	subj_addr_time_yr_nm	char(2)
+SUBJ_ADDR_TIME_MO_NUM CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 	subj_addr_time_mo_num	char(2)
+ZIP_CD CHAR(5 OCTETS) NOT NULL DEFAULT ' ', 	zip_cd	char(5)
+ZIP_EXTS_CD CHAR(4 OCTETS) NOT NULL DEFAULT ' ', 	zip_exts_cd	char(4)
+ZIP_EXTS_MTCH_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	zip_exts_mtch_cd	char(1)
+ZIP_MTCH_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	zip_mtch_cd	char(1)
+LATUD_NUM CHAR(9 OCTETS) NOT NULL DEFAULT ' ', 	latud_num	char(9)
+LNGTD_NUM CHAR(11 OCTETS) NOT NULL DEFAULT ' ', 	lngtd_num	char(11)
+LOC_NUM CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	loc_num	char(3)
+TYPE_MTCH_ACRY_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	type_mtch_acry_cd	char(1)
+CNTY_CD CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	cnty_cd	char(3)
+CRNT_SRC_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 	crnt_src_cd	char(2)
+CFDT_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	cfdt_cd	char(1)
+RSOL_DSTNC_NUM CHAR(6 OCTETS) NOT NULL DEFAULT ' ', 	rsol_dstnc_num	char(6)
+COR_CD CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	cor_cd	char(3)
+OFF_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 		
+FDW_INSRT_TSTMP TIMESTAMP NOT NULL DEFAULT CURRENT TIMESTAMP	insrt_tstmp	timestamp
+		
+		
+FDWATOMCSHOP.CLM_INFO	euirltnh_raw.clm_info	
+CLM_ID CHAR(11 OCTETS) NOT NULL, 	clm_id	char(11)
+PROD_ORD_ID CHAR(11 OCTETS) NOT NULL, 	prod_ord_id	char(11)
+ADDR_MTCH_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	addr_mtch_cd	char(1)
+AT_FALT_IND CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	at_falt_ind	char(1)
+CAT_CLM_IND CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	cat_clm_ind	char(1)
+CLM_AGE_MO CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 	clm_age_mo	char(2)
+CLM_AGE_YR CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 	clm_age_yr	char(2)
+CLM_TYPE_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 	clm_type_cd	char(2)
+CNTRB_CLM_NUM CHAR(20 OCTETS) NOT NULL DEFAULT ' ', 	cntrb_clm_num	char(20)
+DISPT_RESOL_DT CHAR(8 OCTETS) NOT NULL DEFAULT ' ', 	dispt_resol_dt	char(8)
+DL_MTCH_IND CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	dl_mtch_ind	char(1)
+FIRST_PMT_DT CHAR(8 OCTETS) NOT NULL DEFAULT ' ', 	first_pmt_dt	char(8)
+LTPMT_DT CHAR(8 OCTETS) NOT NULL DEFAULT ' ', 	ltpmt_dt	char(8)
+LOS_DT CHAR(8 OCTETS) NOT NULL DEFAULT ' ', 	los_dt	char(8)
+LOS_LOC_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	los_loc_cd	char(1)
+POLHD_IND CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	polhd_ind	char(1)
+PHONE_MTCH_IND CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	phone_mtch_ind	char(1)
+PKG_NUM CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	pkg_num	char(3)
+SEQ_NUM CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	seq_num	char(3)
+SSN_MTCH_IND CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	ssn_mtch_ind	char(1)
+VEH_OPER_IND CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	veh_oper_ind	char(1)
+VNDR_CLM_NUM CHAR(20 OCTETS) NOT NULL DEFAULT ' ', 	vndr_clm_num	char(20)
+AUTO_SF_CLM_NUM CHAR(9 OCTETS) NOT NULL DEFAULT ' ', 	auto_sf_clm_num	char(9)
+AUTO_SF_PLCY_NUM CHAR(18 OCTETS) NOT NULL DEFAULT ' ', 	auto_sf_plcy_num	char(18)
+OFF_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 		
+FDW_INSRT_TSTMP TIMESTAMP NOT NULL DEFAULT CURRENT TIMESTAMP	insrt_tstmp	timestamp
+		
+		
+FDWATOMCSHOP.CLM_PMT_INFO	euirltnh_raw.clm_pmt_info	
+CLM_ID CHAR(11 OCTETS) NOT NULL, 	clm_id	char(11)
+CLM_PMT_ID SMALLINT NOT NULL, 	clm_pmt_id	smallint
+CLM_AMT CHAR(9 OCTETS) NOT NULL DEFAULT ' ', 	clm_amt	char(9)
+CLM_DISP_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 	clm_disp_cd	char(2)
+COV_TYPE_CD CHAR(5 OCTETS) NOT NULL DEFAULT ' ', 	cov_type_cd	char(5)
+PKG_NUM CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	pkg_num	char(3)
+SEQ_NUM CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	seq_num	char(3)
+OFF_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 		
+FDW_INSRT_TSTMP TIMESTAMP NOT NULL DEFAULT CURRENT TIMESTAMP	insrt_tstmp	timestamp
+		
+		
+FDWATOMCSHOP.CNSM_DEC	euirltnh_raw.cnsm_dec	
+CNSM_DEC_ID CHAR(11 OCTETS) NOT NULL, 	cnsm_dec_id	char(11)
+CLM_ID CHAR(11 OCTETS) NOT NULL, 	clm_id	char(11)
+CNSM_DEC_REC_DT CHAR(8 OCTETS) NOT NULL DEFAULT ' ', 	cnsm_dec_rec_dt	char(8)
+DLTE_DT CHAR(8 OCTETS) NOT NULL DEFAULT ' ', 	dlte_dt	char(8)
+FILR_CLMT_RLTN_TXT CHAR(12 OCTETS) NOT NULL DEFAULT ' ', 	filr_clmt_rltn_txt	char(12)
+FILR_NM CHAR(50 OCTETS) NOT NULL DEFAULT ' ', 	filr_nm	char(50)
+PKG_NUM CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	pkg_num	char(3)
+SEQ_NUM CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	seq_num	char(3)
+OFF_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 		
+FDW_INSRT_TSTMP TIMESTAMP NOT NULL DEFAULT CURRENT TIMESTAMP	insrt_tstmp	timestamp
+		
+		
+FDWATOMCSHOP.DRLIC_INFO	euirltnh_raw.drlic_info	
+DRVR_LICNS_ID CHAR(11 OCTETS) NOT NULL DEFAULT '', 	drvr_licns_id	char(11)
+PROD_ORD_ID CHAR(11 OCTETS) NOT NULL DEFAULT '', 	prod_ord_id	char(11)
+SUBJ_ID CHAR(11 OCTETS) NOT NULL DEFAULT '', 	subj_id	char(11)
+DRVR_LICNS_CLAS_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	drvr_licns_clas_cd	char(1)
+DRVR_LICNS_CLAS_MTCH_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	drvr_licns_clas_mtch_cd	char(1)
+DRVR_LICNS_NUM CHAR(25 OCTETS) NOT NULL DEFAULT ' ', 	drvr_licns_num	char(25)
+DRVR_LICNS_NUM_MTCH_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	drvr_licns_num_mtch_cd	char(1)
+DRVR_LICNS_RSTRC_TXT CHAR(15 OCTETS) NOT NULL DEFAULT ' ', 	drvr_licns_rstrc_txt	char(15)
+DRVR_LICNS_ST_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 	drvr_licns_st_cd	char(2)
+DRVR_LICNS_STTS_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	drvr_licns_stts_cd	char(1)
+DRVR_LICNS_ST_MTCH_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	drvr_licns_st_mtch_cd	char(1)
+PKG_NUM CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	pkg_num	char(3)
+SEQ_NUM CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	seq_num	char(3)
+SF_ORIGN_IND CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	sf_orign_ind	char(1)
+OFF_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 		
+FDW_INSRT_TSTMP TIMESTAMP NOT NULL DEFAULT CURRENT TIMESTAMP	insrt_tstmp	timestamp
+		
+		
+FDWATOMCSHOP.LOAN_INFO	euirltnh_raw.loan_info	
+LOAN_ID CHAR(11 OCTETS) NOT NULL, 	loan_id	char(11)
+PROD_ORD_ID CHAR(11 OCTETS) NOT NULL, 	prod_ord_id	char(11)
+CLM_ID CHAR(11 OCTETS) NOT NULL, 	clm_id	char(11)
+LOAN_INSTN_NM CHAR(80 OCTETS) NOT NULL DEFAULT ' ', 	loan_instn_nm	char(80)
+LOAN_INSTN_MTCH_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	loan_instn_mtch_cd	char(1)
+LOAN_NUM CHAR(32 OCTETS) NOT NULL DEFAULT ' ', 	loan_num	char(32)
+LOAN_NUM_MTCH_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	loan_num_mtch_cd	char(1)
+PKG_NUM CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	pkg_num	char(3)
+SEQ_NUM CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	seq_num	char(3)
+SF_ORIGN_IND CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	sf_orign_ind	char(1)
+OFF_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 		
+FDW_INSRT_TSTMP TIMESTAMP NOT NULL DEFAULT CURRENT TIMESTAMP	insrt_tstmp	timestamp
+		
+		
+FDWATOMCSHOP.ORD_SUM	euirltnh_raw.ord_sum	
+PROD_ORD_ID CHAR(11 OCTETS) NOT NULL, 	prod_ord_id	char(11)
+SUM_ID SMALLINT NOT NULL, 	sum_id	smallint
+PKG_NUM CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	pkg_num	char(3)
+SEQ_NUM CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	seq_num	char(3)
+SUM_CNT CHAR(7 OCTETS) NOT NULL DEFAULT ' ', 	sum_cnt	char(7)
+SUM_RPT_CLAS_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 	sum_rpt_clas_cd	char(2)
+SUM_STTS_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	sum_stts_cd	char(1)
+SUM_TYPE_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 	sum_type_cd	char(2)
+OFF_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 		
+FDW_INSRT_TSTMP TIMESTAMP NOT NULL DEFAULT CURRENT TIMESTAMP	insrt_tstmp	timestamp
+		
+		
+FDWATOMCSHOP.PHONE_INFO	euirltnh_raw.phone_info	
+PHONE_ID CHAR(11 OCTETS) NOT NULL, 	phone_id	char(11)
+PHONE_AREA_CD_NUM CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	phone_area_cd_num	char(3)
+PHONE_AREA_MTCH_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	phone_area_mtch_cd	char(1)
+PHONE_EXCH_NUM CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	phone_exch_num	char(3)
+PHONE_EXCH_MTCH_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	phone_exch_mtch_cd	char(1)
+PHONE_EXTS_MTCH_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	phone_exts_mtch_cd	char(1)
+PHONE_EXTS_NUM CHAR(4 OCTETS) NOT NULL DEFAULT ' ', 	phone_exts_num	char(4)
+PHONE_LOC_NUM CHAR(4 OCTETS) NOT NULL DEFAULT ' ', 	phone_loc_num	char(4)
+PHONE_LOC_MTCH_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	phone_loc_mtch_cd	char(1)
+PHONE_TYPE_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 	phone_type_cd	char(2)
+PKG_IND CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	pkg_ind	char(1)
+PKG_NUM CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	pkg_num	char(3)
+SEQ_NUM CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	seq_num	char(3)
+SF_ORIGN_IND CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	sf_orign_ind	char(1)
+OFF_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 		
+FDW_INSRT_TSTMP TIMESTAMP NOT NULL DEFAULT CURRENT TIMESTAMP	insrt_tstmp	timestamp
+		
+		
+FDWATOMCSHOP.PROD_ORD	euirltnh_raw.prod_ord	
+PROD_ORD_ID CHAR(11 OCTETS) NOT NULL, 	prod_ord_id	char(11)
+PROD_RQST_ID CHAR(11 OCTETS) NOT NULL, 	prod_rqst_id	char(11)
+BGIN_MSG_NUM CHAR(4 OCTETS) NOT NULL DEFAULT ' ', 	bgin_msg_num	char(4)
+BUSN_TYPE_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	busn_type_cd	char(1)
+CLM_KEY_NUM CHAR(11 OCTETS) NOT NULL DEFAULT ' ', 	clm_key_num	char(11)
+CO_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	co_cd	char(1)
+END_MSG_NUM CHAR(4 OCTETS) NOT NULL DEFAULT ' ', 	end_msg_num	char(4)
+NEW_PLCY_IND CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	new_plcy_ind	char(1)
+ORD_CMPLN_TSTMP TIMESTAMP, 	ord_cmpln_tstmp	timestamp
+ORD_CMPLN_DT DATE, 	ord_cmpln_dt	timestamp
+ORD_METHD_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	ord_methd_cd	char(1)
+ORD_PLCMT_DT DATE, 	ord_plcmt_dt	timestamp
+ORD_PLCMT_TSTMP TIMESTAMP, 	ord_plcmt_tstmp	timestamp
+ORD_RSLT_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	ord_rslt_cd	char(1)
+PKG_NUM CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	pkg_num	char(3)
+PLCY_UPDT_IND CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	plcy_updt_ind	char(1)
+PRES_TYPE_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	pres_type_cd	char(1)
+PROD_ORD_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	prod_ord_cd	char(1)
+PROD_ORD_FNSH CHAR(8 OCTETS) NOT NULL DEFAULT ' ', 	prod_ord_fnsh	char(8)
+PROD_ORD_FNSH_DT DATE, 	prod_ord_fnsh_dt	timestamp
+PROD_ORD_PL_JOB_NUM CHAR(8 OCTETS) NOT NULL DEFAULT ' ', 	prod_ord_pl_job_num	char(8)
+PROD_ORD_REC_JOB_NUM CHAR(8 OCTETS) NOT NULL DEFAULT ' ', 	prod_ord_rec_job_num	char(8)
+PROD_ORD_RVW_DT DATE, 	prod_ord_rvw_dt	timestamp
+PROD_ORD_RVW_NUM CHAR(8 OCTETS) NOT NULL DEFAULT ' ', 	prod_ord_rvw_num	char(8)
+PROD_ORD_SEND_JOB_NUM CHAR(8 OCTETS) NOT NULL DEFAULT ' ', 	prod_ord_send_job_num	char(8)
+PROD_RULE_NM CHAR(48 OCTETS) NOT NULL DEFAULT ' ', 	prod_rule_nm	char(48)
+PROD_RULE_VALUE CHAR(96 OCTETS) NOT NULL DEFAULT ' ', 	prod_rule_value	char(96)
+RALGN_PLCY_IND CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	ralgn_plcy_ind	char(1)
+RISK_CLM_CNT CHAR(10 OCTETS) NOT NULL DEFAULT ' ', 	risk_clm_cnt	char(10)
+RPT_USE_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 	rpt_use_cd	char(2)
+RLT_CLM_CNT CHAR(10 OCTETS) NOT NULL DEFAULT ' ', 	rlt_clm_cnt	char(10)
+RQST_PRNT_RPT_IND CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	rqst_prnt_rpt_ind	char(1)
+SEQ_NUM CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	seq_num	char(3)
+SF_VEH_CNT CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 	sf_veh_cnt	char(2)
+SUBJ_CLM_CNT CHAR(10 OCTETS) NOT NULL DEFAULT ' ', 	subj_clm_cnt	char(10)
+VIN_CLM_CNT CHAR(10 OCTETS) NOT NULL DEFAULT ' ', 	vin_clm_cnt	char(10)
+VNDR_ACCT_NUM CHAR(10 OCTETS) NOT NULL DEFAULT ' ', 	vndr_acct_num	char(10)
+VNDR_BYPAS_IND CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	vndr_bypas_ind	char(1)
+VNDR_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 	vndr_cd	char(2)
+VNDR_QUOT_BACK_TXT CHAR(20 OCTETS) NOT NULL DEFAULT ' ', 	vndr_quot_back_txt	char(20)
+VNDR_RPT_REFR_NUM CHAR(20 OCTETS) NOT NULL DEFAULT ' ', 	vndr_rpt_refr_num	char(20)
+VNDR_SRCH_TYPE_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 	vndr_srch_type_cd	char(2)
+PROD_ORD_PRCS_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	prod_ord_prcs_cd	char(1)
+PLCY_TRMNT_IND CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	plcy_trmnt_ind	char(1)
+ABT_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	abt_cd	char(1)
+GRP_ID CHAR(11 OCTETS) NOT NULL DEFAULT ' ', 	grp_id	char(11)
+OFF_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 		
+FDW_INSRT_TSTMP TIMESTAMP NOT NULL DEFAULT CURRENT TIMESTAMP	insrt_tstmp	timestamp
+		
+		
+FDWATOMCSHOP.PROD_RQST	euirltnh_raw.prod_rqst	
+PROD_RQST_ID CHAR(11 OCTETS) NOT NULL, 	prod_rqst_id	char(11)
+AFO_ID CHAR(4 OCTETS) NOT NULL DEFAULT ' ', 	afo_id	char(4)
+AGT_ID CHAR(8 OCTETS) NOT NULL DEFAULT ' ', 	agt_id	char(8)
+GRP_ORD_IND CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	grp_ord_ind	char(1)
+FUNC_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	func_cd	char(1)
+RCPNT_ID CHAR(16 OCTETS) NOT NULL DEFAULT ' ', 	rcpnt_id	char(16)
+ROUTE_ID CHAR(16 OCTETS) NOT NULL DEFAULT ' ', 	route_id	char(16)
+RQST_ID CHAR(16 OCTETS) NOT NULL DEFAULT ' ', 	rqst_id	char(16)
+RQST_SYS_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	rqst_sys_cd	char(1)
+RQST_TSTMP TIMESTAMP NOT NULL, 	rqst_tstmp	timestamp
+SF_PLCY_NUM CHAR(18 OCTETS) NOT NULL DEFAULT ' ', 	sf_plcy_num	char(18)
+BAS_CLM_NUM CHAR(7 OCTETS) NOT NULL DEFAULT ' ', 	bas_clm_num	char(7)
+LIFE_TEMP_APP_NUM CHAR(10 OCTETS) NOT NULL DEFAULT ' ', 	life_temp_app_num	char(10)
+PROD_RQST_PRCS_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	prod_rqst_prcs_cd	char(1)
+PLCY_TYPE_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	plcy_type_cd	char(1)
+PLCY_FORM_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	plcy_form_cd	char(1)
+OFF_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 		
+FDW_INSRT_TSTMP TIMESTAMP NOT NULL DEFAULT CURRENT TIMESTAMP	insrt_tstmp	timestamp
+		
+		
+FDWATOMCSHOP.SUBJ_INFO	euirltnh_raw.subj_info	
+SUBJ_ID CHAR(11 OCTETS) NOT NULL DEFAULT '', 	subj_id	char(11)
+PROD_ORD_ID CHAR(11 OCTETS) NOT NULL DEFAULT '', 	prod_ord_id	char(11)
+CLM_ID CHAR(11 OCTETS) NOT NULL DEFAULT '', 	clm_id	char(11)
+PLCY_ID CHAR(11 OCTETS) NOT NULL DEFAULT '', 	plcy_id	char(11)
+PHONE_ID CHAR(11 OCTETS) NOT NULL DEFAULT '', 	phone_id	char(11)
+AGE_NUM CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	age_num	char(3)
+AGE_MTCH_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	age_mtch_cd	char(1)
+BIRTH_DT CHAR(8 OCTETS) NOT NULL DEFAULT ' ', 	birth_dt	char(8)
+BIRTH_DT_MTCH_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	birth_dt_mtch_cd	char(1)
+DRVR_ID CHAR(11 OCTETS) NOT NULL DEFAULT ' ', 	drvr_id	char(11)
+EYE_COLOR_CD CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	eye_color_cd	char(3)
+EYE_COLOR_MTCH_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	eye_color_mtch_cd	char(1)
+FIRST_NM CHAR(40 OCTETS) NOT NULL DEFAULT ' ', 	first_nm	char(40)
+FIRST_NM_MTCH_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	first_nm_mtch_cd	char(1)
+GNDR_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	gndr_cd	char(1)
+GNDR_CD_MTCH_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	gndr_cd_mtch_cd	char(1)
+HAIR_COLOR_CD CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	hair_color_cd	char(3)
+HAIR_COLOR_MTCH_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	hair_color_mtch_cd	char(1)
+HT_NUM CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	ht_num	char(3)
+HT_MTCH_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	ht_mtch_cd	char(1)
+LAST_NM CHAR(50 OCTETS) NOT NULL DEFAULT ' ', 	last_nm	char(50)
+LAST_NM_MTCH_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	last_nm_mtch_cd	char(1)
+MID_NM CHAR(18 OCTETS) NOT NULL DEFAULT ' ', 	mid_nm	char(18)
+MID_NM_MTCH_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	mid_nm_mtch_cd	char(1)
+MRTL_STTS_MTCH_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	mrtl_stts_mtch_cd	char(1)
+MRTL_STTS_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 	mrtl_stts_cd	char(2)
+NM_PREFX_TXT CHAR(4 OCTETS) NOT NULL DEFAULT ' ', 	nm_prefx_txt	char(4)
+NM_PREFX_MTCH_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	nm_prefx_mtch_cd	char(1)
+NM_SFX_TXT CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	nm_sfx_txt	char(3)
+NM_SFX_MTCH_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	nm_sfx_mtch_cd	char(1)
+NM_VARN_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	nm_varn_cd	char(1)
+PKG_NUM CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	pkg_num	char(3)
+SEQ_NUM CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	seq_num	char(3)
+SF_ORIGN_IND CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	sf_orign_ind	char(1)
+SSN CHAR(9 OCTETS) NOT NULL DEFAULT ' ', 	ssn	char(9)
+SSN_MTCH_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	ssn_mtch_cd	char(1)
+SUBJ_PROD_ROLE_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 	subj_prod_role_cd	char(2)
+WGT_NUM CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	wgt_num	char(3)
+WGT_MTCH_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	wgt_mtch_cd	char(1)
+CR_CNSNT_IND CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	cr_cnsnt_ind	char(1)
+SUBJ_SRCH_RSLT_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 	subj_srch_rslt_cd	char(2)
+OFF_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 		
+FDW_INSRT_TSTMP TIMESTAMP NOT NULL DEFAULT CURRENT TIMESTAMP	insrt_tstmp	timestamp
+		
+		
+FDWATOMCSHOP.VNDR_RPT_SUBJ	euirltnh_raw.vndr_rpt_subj	
+VNDR_RPT_SUBJ_ID CHAR(11 OCTETS) NOT NULL, 	vndr_rpt_subj_id   	 char(11)   
+PLCY_ID CHAR(11 OCTETS) NOT NULL, 	plcy_id            	 char(11)   
+SUBJ_SRC_CD SMALLINT NOT NULL, 	subj_src_cd        	 smallint   
+SUBJ_NM VARCHAR(30 OCTETS) NOT NULL DEFAULT '', 	subj_nm            	 varchar(30)
+SUBJ_NUM CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 	subj_num           	 char(2)    
+SUBJ_BGIN_DT DATE, 	subj_bgin_dt       	 timestamp  
+SUBJ_END_DT DATE, 	subj_end_dt        	 timestamp  
+SUBJ_CURNT_CRRR_DT DATE, 	subj_curnt_crrr_dt 	 timestamp  
+SUBJ_PLCY_CANC_CNT SMALLINT, 	subj_plcy_canc_cnt 	 smallint   
+SUBJ_PLCY_LAST_DT DATE, 	subj_plcy_last_dt  	 timestamp  
+SUBJ_POLHD_RLT_TXT CHAR(10 OCTETS) NOT NULL DEFAULT ' ', 	subj_polhd_rlt_txt 	 char(10)   
+OFF_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 		
+FDW_INSRT_TSTMP TIMESTAMP NOT NULL DEFAULT CURRENT TIMESTAMP	insrt_tstmp        	 timestamp  
+		
+		
+FDWATOMCSHOP.VEH_COV	euirltnh_raw.veh_cov	
+PLCY_ID CHAR(11 OCTETS) NOT NULL, 	plcy_id         	 char(11) 
+VEH_ID CHAR(11 OCTETS) NOT NULL, 	veh_id          	 char(11) 
+VEH_COV_SEQ_NUM CHAR(3 OCTETS) NOT NULL, 	veh_cov_seq_num 	 char(3)  
+COV_CD CHAR(2 OCTETS) NOT NULL, 	cov_cd          	 char(2)  
+DDCT_AMT CHAR(5 OCTETS) NOT NULL DEFAULT ' ', 	ddct_amt        	 char(5)  
+OFF_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 		
+FDW_INSRT_TSTMP TIMESTAMP NOT NULL DEFAULT CURRENT TIMESTAMP	insrt_tstmp     	 timestamp
+		
+		
+FDWATOMCSHOP.PLCY_VEH_RLTN	euirltnh_raw.plcy_veh_rltn	
+PLCY_ID CHAR(11 OCTETS) NOT NULL, 	 plcy_id            	 char(11) 
+VEH_ID CHAR(11 OCTETS) NOT NULL, 	 veh_id             	 char(11) 
+VEH_COV_LMT_DE_TXT CHAR(23 OCTETS) NOT NULL DEFAULT ' ', 	 veh_cov_lmt_de_txt 	 char(23) 
+OFF_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 		
+FDW_INSRT_TSTMP TIMESTAMP NOT NULL DEFAULT CURRENT TIMESTAMP	 insrt_tstmp        	 timestamp
+		
+		
+FDWATOMCSHOP.VEH_INFO	euirltnh_raw.veh_info	
+VEH_ID CHAR(11 OCTETS) NOT NULL DEFAULT '', 	veh_id             	 char(11)    
+CLM_ID CHAR(11 OCTETS) NOT NULL DEFAULT '', 	clm_id             	 char(11)    
+PROD_ORD_ID CHAR(11 OCTETS) NOT NULL DEFAULT '', 	prod_ord_id        	 char(11)    
+PKG_NUM CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	pkg_num            	 char(3)     
+SEQ_NUM CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	seq_num            	 char(3)     
+SF_ORIGN_IND CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	sf_orign_ind       	 char(1)     
+VEH_DISP_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	veh_disp_cd        	 char(1)     
+VEH_MAKE_NM CHAR(40 OCTETS) NOT NULL DEFAULT ' ', 	veh_make_nm        	 char(40)    
+VEH_MAKE_MTCH_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	veh_make_mtch_cd   	 char(1)     
+VEH_MODEL_NM CHAR(40 OCTETS) NOT NULL DEFAULT ' ', 	veh_model_nm       	 char(40)    
+VEH_MODEL_MTCH_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	veh_model_mtch_cd  	 char(1)     
+VEH_TYPE_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 	veh_type_cd        	 char(2)     
+VEH_YR_NUM CHAR(4 OCTETS) NOT NULL DEFAULT ' ', 	veh_yr_num         	 char(4)     
+VEH_YR_MTCH_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	veh_yr_mtch_cd     	 char(1)     
+VIN CHAR(25 OCTETS) NOT NULL DEFAULT ' ', 	vin                	 char(25)    
+VIN_MTCH_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	vin_mtch_cd        	 char(1)     
+VEH_OWNSP_TYPE_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 	veh_ownsp_type_cd  	 char(2)     
+BRAND_VEH_IND CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	brand_veh_ind      	 char(1)     
+VEH_REG_DT DATE, 	veh_reg_dt         	 timestamp   
+VEH_REG_EXP_DT DATE, 	veh_reg_exp_dt     	 timestamp   
+VEH_PURCH_DT DATE, 	veh_purch_dt       	 timestamp   
+VEH_SOLD_DT DATE, 	veh_sold_dt        	 timestamp   
+VEH_TITLE_ISS_DT DATE, 	veh_title_iss_dt   	 timestamp   
+VEH_BASE_PRICE_AMT INTEGER, 	veh_base_price_amt 	 int         
+VEH_PRICE_VAR_AMT SMALLINT, 	veh_price_var_amt  	 smallint    
+VEH_SHIP_WGT_CNT SMALLINT, 	veh_ship_wgt_cnt   	 smallint    
+VEH_SHIP_WGT_V_CNT SMALLINT, 	veh_ship_wgt_v_cnt 	 smallint    
+VEH_TIRE_SPEC_TXT CHAR(6 OCTETS) NOT NULL DEFAULT ' ', 	veh_tire_spec_txt  	 char(6)     
+VEH_FUEL_DELVR_TXT CHAR(14 OCTETS) NOT NULL DEFAULT ' ', 	veh_fuel_delvr_txt 	 char(14)    
+VEH_MIN_WHEEL_CNT DECIMAL(4 , 1), 	veh_min_wheel_cnt  	 decimal(4,1)
+VEH_MAX_WHEEL_CNT DECIMAL(4 , 1), 	veh_max_wheel_cnt  	 decimal(4,1)
+ENGN_DPLC_CNT SMALLINT, 	engn_dplc_cnt      	 smallint    
+VEH_ENGN_CYL_CNT SMALLINT, 	veh_engn_cyl_cnt   	 smallint    
+VEH_ORIG_CNTRY_NM CHAR(11 OCTETS) NOT NULL DEFAULT ' ', 	veh_orig_cntry_nm  	 char(11)    
+VEH_FUEL_TYPE_NM CHAR(11 OCTETS) NOT NULL DEFAULT ' ', 	veh_fuel_type_nm   	 char(11)    
+GVW_DESC_TXT CHAR(15 OCTETS) NOT NULL DEFAULT ' ', 	gvw_desc_txt       	 char(15)    
+VEH_MIN_PYLD_C_CNT DECIMAL(4 , 2), 	veh_min_pyld_c_cnt 	 decimal(4,2)
+VEH_MAX_PYLD_C_CNT DECIMAL(4 , 2), 	veh_max_pyld_c_cnt 	 decimal(4,2)
+VEH_WHEEL_CNT SMALLINT, 	veh_wheel_cnt      	 smallint    
+VEH_DRV_WHEEL_CNT SMALLINT, 	veh_drv_wheel_cnt  	 smallint    
+VEH_ENGN_CYCLE_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	veh_engn_cycle_cd  	 char(1)     
+ANTLK_BRAKE_SY_TXT CHAR(13 OCTETS) NOT NULL DEFAULT ' ', 	antlk_brake_sy_txt 	 char(13)    
+VEH_AC_OPT_CD CHAR(8 OCTETS) NOT NULL DEFAULT ' ', 	veh_ac_opt_cd      	 char(8)     
+VEH_PWR_STEER_O_CD CHAR(8 OCTETS) NOT NULL DEFAULT ' ', 	veh_pwr_steer_o_cd 	 char(8)     
+VEH_PWR_BRAKE_O_CD CHAR(8 OCTETS) NOT NULL DEFAULT ' ', 	veh_pwr_brake_o_cd 	 char(8)     
+VEH_PWR_WNDW_OP_CD CHAR(8 OCTETS) NOT NULL DEFAULT ' ', 	veh_pwr_wndw_op_cd 	 char(8)     
+VEH_TLT_WHEEL_O_CD CHAR(8 OCTETS) NOT NULL DEFAULT ' ', 	veh_tlt_wheel_o_cd 	 char(8)     
+VEH_FRONT_WHEEL_CD CHAR(5 OCTETS) NOT NULL DEFAULT ' ', 	veh_front_wheel_cd 	 char(5)     
+VEH_FOUR_WHEEL_CD CHAR(5 OCTETS) NOT NULL DEFAULT ' ', 	veh_four_wheel_cd  	 char(5)     
+VEH_SECUR_TYPE_TXT CHAR(8 OCTETS) NOT NULL DEFAULT ' ', 	veh_secur_type_txt 	 char(8)     
+VEH_RSTNT_AIR_TXT CHAR(6 OCTETS) NOT NULL DEFAULT ' ', 	veh_rstnt_air_txt  	 char(6)     
+VEH_RSTNT_BELT_TXT CHAR(7 OCTETS) NOT NULL DEFAULT ' ', 	veh_rstnt_belt_txt 	 char(7)     
+VEH_MEDM_TYPE_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	veh_medm_type_cd   	 char(1)     
+BUSN_USE_IND CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	busn_use_ind       	 char(1)     
+LEASE_VEH_IND CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	lease_veh_ind      	 char(1)     
+DCODE_RSLT_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	dcode_rslt_cd      	 char(1)     
+DCODE_VEH_TYPE_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	dcode_veh_type_cd  	 char(1)     
+DCODE_VEH_BODY_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 	dcode_veh_body_cd  	 char(2)     
+DCODE_VEH_BODY_TXT CHAR(20 OCTETS) NOT NULL DEFAULT ' ', 	dcode_veh_body_txt 	 char(20)    
+DCODE_VEH_YR_TXT CHAR(4 OCTETS) NOT NULL DEFAULT ' ', 	dcode_veh_yr_txt   	 char(4)     
+DCODE_VEH_MAKE_NM CHAR(20 OCTETS) NOT NULL DEFAULT ' ', 	dcode_veh_make_nm  	 char(20)    
+DCODE_VEH_MAKE_CD CHAR(4 OCTETS) NOT NULL DEFAULT ' ', 	dcode_veh_make_cd  	 char(4)     
+DCODE_VEH_SERS_NM CHAR(20 OCTETS) NOT NULL DEFAULT ' ', 	dcode_veh_sers_nm  	 char(20)    
+DCODE_VEH_SERS_CD CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	dcode_veh_sers_cd  	 char(3)     
+DCODE_VEH_SUB_S_NM CHAR(20 OCTETS) NOT NULL DEFAULT ' ', 	dcode_veh_sub_s_nm 	 char(20)    
+DCODE_VEH_SUB_S_CD CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	dcode_veh_sub_s_cd 	 char(3)     
+OFF_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 		
+FDW_INSRT_TSTMP TIMESTAMP NOT NULL DEFAULT CURRENT TIMESTAMP	insrt_tstmp        	 timestamp   
+		
+		
+FDWATOMCSHOP.PLCY_INFO	euirltnh_raw.plcy_info	
+PLCY_ID CHAR(11 OCTETS) NOT NULL, 	plcy_id            	 char(11) 
+PROD_ORD_ID CHAR(11 OCTETS) NOT NULL, 	prod_ord_id        	 char(11) 
+CLM_ID CHAR(11 OCTETS) NOT NULL, 	clm_id             	 char(11) 
+IBC_CLAS_CD CHAR(6 OCTETS) NOT NULL DEFAULT ' ', 	ibc_clas_cd        	 char(6)  
+PKG_IND CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	pkg_ind            	 char(1)  
+PKG_NUM CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	pkg_num            	 char(3)  
+PLCY_CO CHAR(20 OCTETS) NOT NULL DEFAULT ' ', 	plcy_co            	 char(20) 
+PLCY_CO_MTCH_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	plcy_co_mtch_cd    	 char(1)  
+PLCY_EFF_DT CHAR(8 OCTETS) NOT NULL DEFAULT ' ', 	plcy_eff_dt        	 char(8)  
+PLCY_NUM CHAR(20 OCTETS) NOT NULL DEFAULT ' ', 	plcy_num           	 char(20) 
+PLCY_NUM_MTCH_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	plcy_num_mtch_cd   	 char(1)  
+PLCY_STTS_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	plcy_stts_cd       	 char(1)  
+PLCY_TRMNT_DT CHAR(8 OCTETS) NOT NULL DEFAULT ' ', 	plcy_trmnt_dt      	 char(8)  
+PLCY_TYPE_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 	plcy_type_cd       	 char(2)  
+PLCY_TYPE_MTCH_CD CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	plcy_type_mtch_cd  	 char(1)  
+SEQ_NUM CHAR(3 OCTETS) NOT NULL DEFAULT ' ', 	seq_num            	 char(3)  
+SF_ORIGN_IND CHAR(1 OCTETS) NOT NULL DEFAULT ' ', 	sf_orign_ind       	 char(1)  
+RISK_TYPE_TXT CHAR(9 OCTETS) NOT NULL DEFAULT ' ', 	risk_type_txt      	 char(9)  
+PLCY_INCP_DT DATE, 	plcy_incp_dt       	 timestamp
+PLCY_STTS_TXT CHAR(9 OCTETS) NOT NULL DEFAULT ' ', 	plcy_stts_txt      	 char(9)  
+PLCY_POSTL_PRVN_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 	plcy_postl_prvn_cd 	 char(2)  
+LAST_CANC_RESN_CD CHAR(4 OCTETS) NOT NULL DEFAULT ' ', 	last_canc_resn_cd  	 char(4)  
+AM_BEST_NUM CHAR(5 OCTETS) NOT NULL DEFAULT ' ', 	am_best_num        	 char(5)  
+NATL_ASSN_INS_NUM CHAR(5 OCTETS) NOT NULL DEFAULT ' ', 	natl_assn_ins_num  	 char(5)  
+OFF_CD CHAR(2 OCTETS) NOT NULL DEFAULT ' ', 		
+FDW_INSRT_TSTMP TIMESTAMP NOT NULL DEFAULT CURRENT TIMESTAMP	insrt_tstmp        	 timestamp
+		
