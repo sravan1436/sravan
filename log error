@@ -1,9 +1,9 @@
 [0KRunning with gitlab-runner 13.6.0 (8fa89735)
 [0;m[0K  on xdcsbld1t3-runner C2qaJ1UH
-[0;msection_start:1623645081:resolve_secrets
+[0;msection_start:1623647133:resolve_secrets
 [0K[0K[36;1mResolving secrets[0;m
-[0;msection_end:1623645081:resolve_secrets
-[0Ksection_start:1623645081:prepare_executor
+[0;msection_end:1623647133:resolve_secrets
+[0Ksection_start:1623647133:prepare_executor
 [0K[0K[36;1mPreparing the "docker" executor[0;m
 [0;m[0KUsing Docker executor with image registry.sfgitlab.opr.statefarm.org/registry/sfcommon/app-builder:8.4.0-jdk8-root ...
 [0;m[0KAuthenticating with credentials from job payload (GitLab Registry)
@@ -12,21 +12,26 @@
 [0;m[0KAuthenticating with credentials from job payload (GitLab Registry)
 [0;m[0KPulling docker image registry.sfgitlab.opr.statefarm.org/registry/sfcommon/app-builder:8.4.0-jdk8-root ...
 [0;m[0KUsing docker image sha256:641eb391b3d92e8862202bc42a231358b99dc318dfb944edb6c73dc7b330515a for registry.sfgitlab.opr.statefarm.org/registry/sfcommon/app-builder:8.4.0-jdk8-root with digest registry.sfgitlab.opr.statefarm.org/registry/sfcommon/app-builder@sha256:8e843b97dd4c03ae97bd13165471248a8ed4e6425bb35b47eb6bc9f468f0eb5c ...
-[0;msection_end:1623645206:prepare_executor
-[0Ksection_start:1623645206:prepare_script
+[0;msection_end:1623647136:prepare_executor
+[0Ksection_start:1623647136:prepare_script
 [0K[0K[36;1mPreparing environment[0;m
-[0;mRunning on runner-c2qaj1uh-project-87483-concurrent-1 via 5acfc832879e...
-section_end:1623645207:prepare_script
-[0Ksection_start:1623645207:get_sources
+[0;mRunning on runner-c2qaj1uh-project-87483-concurrent-0 via 5acfc832879e...
+section_end:1623647137:prepare_script
+[0Ksection_start:1623647137:get_sources
 [0K[0K[36;1mGetting source from Git repository[0;m
 [0;m[32;1mFetching changes with git depth set to 50...[0;m
-Initialized empty Git repository in /builds/dcs/bulk-ingestion-aws/eui-common-pl/.git/
-[32;1mCreated fresh repository.[0;m
-[32;1mChecking out 0e4e3d6a as pytest...[0;m
+Reinitialized existing Git repository in /builds/dcs/bulk-ingestion-aws/eui-common-pl/.git/
+[32;1mChecking out 63be6b38 as master...[0;m
+Removing RELEASE.env
 
 [32;1mSkipping Git submodules setup[0;m
-section_end:1623645209:get_sources
-[0Ksection_start:1623645209:step_script
+section_end:1623647138:get_sources
+[0Ksection_start:1623647138:download_artifacts
+[0K[0K[36;1mDownloading artifacts[0;m
+[0;m[32;1mDownloading artifacts for version (28964070)...[0;m
+Downloading artifacts from coordinator... ok      [0;m  id[0;m=28964070 responseStatus[0;m=200 OK token[0;m=xe3SH5nq
+section_end:1623647140:download_artifacts
+[0Ksection_start:1623647140:step_script
 [0K[0K[36;1mExecuting "step_script" stage of the job script[0;m
 [0;m[32;1m$ pip3 install setuptools_scm[0;m
 WARNING: Running pip install with root privileges is generally not a good idea. Try `pip3 install --user` instead.
@@ -44,22 +49,58 @@ Collecting coverage (from -r requirements.txt (line 2))
   Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/coverage/5.5/coverage-5.5-cp36-cp36m-manylinux1_x86_64.whl (240kB)
 Collecting coverage-badge (from -r requirements.txt (line 3))
   Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/coverage-badge/1.0.1/coverage_badge-1.0.1-py2.py3-none-any.whl
-Collecting s3transfer<0.4.0,>=0.3.0 (from boto3==1.14.17->-r requirements.txt (line 1))
-  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/s3transfer/0.3.7/s3transfer-0.3.7-py2.py3-none-any.whl (73kB)
+Collecting pyspark==3.0.2 (from -r requirements.txt (line 4))
+  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/pyspark/3.0.2/pyspark-3.0.2.tar.gz (204.8MB)
+Collecting pandas (from -r requirements.txt (line 5))
+  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/pandas/1.1.5/pandas-1.1.5-cp36-cp36m-manylinux1_x86_64.whl (9.5MB)
+Collecting pytest (from -r requirements.txt (line 6))
+  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/pytest/6.2.4/pytest-6.2.4-py3-none-any.whl (280kB)
+Collecting findspark (from -r requirements.txt (line 7))
+  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/findspark/1.4.2/findspark-1.4.2-py2.py3-none-any.whl
 Collecting jmespath<1.0.0,>=0.7.1 (from boto3==1.14.17->-r requirements.txt (line 1))
   Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/jmespath/0.10.0/jmespath-0.10.0-py2.py3-none-any.whl
 Collecting botocore<1.18.0,>=1.17.17 (from boto3==1.14.17->-r requirements.txt (line 1))
   Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/botocore/1.17.63/botocore-1.17.63-py2.py3-none-any.whl (6.6MB)
+Collecting s3transfer<0.4.0,>=0.3.0 (from boto3==1.14.17->-r requirements.txt (line 1))
+  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/s3transfer/0.3.7/s3transfer-0.3.7-py2.py3-none-any.whl (73kB)
+Collecting py4j==0.10.9 (from pyspark==3.0.2->-r requirements.txt (line 4))
+  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/py4j/0.10.9/py4j-0.10.9-py2.py3-none-any.whl (198kB)
+Collecting pytz>=2017.2 (from pandas->-r requirements.txt (line 5))
+  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/pytz/2021.1/pytz-2021.1-py2.py3-none-any.whl (510kB)
+Collecting python-dateutil>=2.7.3 (from pandas->-r requirements.txt (line 5))
+  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/python-dateutil/2.8.1/python_dateutil-2.8.1-py2.py3-none-any.whl (227kB)
+Collecting numpy>=1.15.4 (from pandas->-r requirements.txt (line 5))
+  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/numpy/1.19.5/numpy-1.19.5-cp36-cp36m-manylinux1_x86_64.whl (13.4MB)
+Collecting toml (from pytest->-r requirements.txt (line 6))
+  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/toml/0.10.2/toml-0.10.2-py2.py3-none-any.whl
+Collecting pluggy<1.0.0a1,>=0.12 (from pytest->-r requirements.txt (line 6))
+  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/pluggy/0.13.1/pluggy-0.13.1-py2.py3-none-any.whl
+Collecting importlib-metadata>=0.12; python_version < "3.8" (from pytest->-r requirements.txt (line 6))
+  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/importlib-metadata/4.5.0/importlib_metadata-4.5.0-py3-none-any.whl
+Collecting py>=1.8.2 (from pytest->-r requirements.txt (line 6))
+  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/py/1.10.0/py-1.10.0-py2.py3-none-any.whl (97kB)
+Collecting packaging (from pytest->-r requirements.txt (line 6))
+  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/packaging/20.9/packaging-20.9-py2.py3-none-any.whl (40kB)
+Collecting iniconfig (from pytest->-r requirements.txt (line 6))
+  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/iniconfig/1.1.1/iniconfig-1.1.1-py2.py3-none-any.whl
+Collecting attrs>=19.2.0 (from pytest->-r requirements.txt (line 6))
+  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/attrs/21.2.0/attrs-21.2.0-py2.py3-none-any.whl (53kB)
 Collecting docutils<0.16,>=0.10 (from botocore<1.18.0,>=1.17.17->boto3==1.14.17->-r requirements.txt (line 1))
   Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/docutils/0.15.2/docutils-0.15.2-py3-none-any.whl (547kB)
 Collecting urllib3<1.26,>=1.20; python_version != "3.4" (from botocore<1.18.0,>=1.17.17->boto3==1.14.17->-r requirements.txt (line 1))
   Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/urllib3/1.25.11/urllib3-1.25.11-py2.py3-none-any.whl (127kB)
-Collecting python-dateutil<3.0.0,>=2.1 (from botocore<1.18.0,>=1.17.17->boto3==1.14.17->-r requirements.txt (line 1))
-  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/python-dateutil/2.8.1/python_dateutil-2.8.1-py2.py3-none-any.whl (227kB)
-Collecting six>=1.5 (from python-dateutil<3.0.0,>=2.1->botocore<1.18.0,>=1.17.17->boto3==1.14.17->-r requirements.txt (line 1))
+Collecting six>=1.5 (from python-dateutil>=2.7.3->pandas->-r requirements.txt (line 5))
   Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/six/1.16.0/six-1.16.0-py2.py3-none-any.whl
-Installing collected packages: docutils, urllib3, jmespath, six, python-dateutil, botocore, s3transfer, boto3, coverage, coverage-badge
-Successfully installed boto3-1.14.17 botocore-1.17.63 coverage-5.5 coverage-badge-1.0.1 docutils-0.15.2 jmespath-0.10.0 python-dateutil-2.8.1 s3transfer-0.3.7 six-1.16.0 urllib3-1.25.11
+Collecting typing-extensions>=3.6.4; python_version < "3.8" (from importlib-metadata>=0.12; python_version < "3.8"->pytest->-r requirements.txt (line 6))
+  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/typing-extensions/3.10.0.0/typing_extensions-3.10.0.0-py3-none-any.whl
+Collecting zipp>=0.5 (from importlib-metadata>=0.12; python_version < "3.8"->pytest->-r requirements.txt (line 6))
+  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/zipp/3.4.1/zipp-3.4.1-py3-none-any.whl
+Collecting pyparsing>=2.0.2 (from packaging->pytest->-r requirements.txt (line 6))
+  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/pyparsing/2.4.7/pyparsing-2.4.7-py2.py3-none-any.whl (67kB)
+Installing collected packages: jmespath, six, python-dateutil, docutils, urllib3, botocore, s3transfer, boto3, coverage, coverage-badge, py4j, pyspark, pytz, numpy, pandas, toml, typing-extensions, zipp, importlib-metadata, pluggy, py, pyparsing, packaging, iniconfig, attrs, pytest, findspark
+  Running setup.py install for pyspark: started
+    Running setup.py install for pyspark: finished with status 'done'
+Successfully installed attrs-21.2.0 boto3-1.14.17 botocore-1.17.63 coverage-5.5 coverage-badge-1.0.1 docutils-0.15.2 findspark-1.4.2 importlib-metadata-4.5.0 iniconfig-1.1.1 jmespath-0.10.0 numpy-1.19.5 packaging-20.9 pandas-1.1.5 pluggy-0.13.1 py-1.10.0 py4j-0.10.9 pyparsing-2.4.7 pyspark-3.0.2 pytest-6.2.4 python-dateutil-2.8.1 pytz-2021.1 s3transfer-0.3.7 six-1.16.0 toml-0.10.2 typing-extensions-3.10.0.0 urllib3-1.25.11 zipp-3.4.1
 [32;1m$ pip install pytest moto cryptography==3.3.1 coverage pytest-cov pytest-html[0;m
 WARNING: Running pip install with root privileges is generally not a good idea. Try `pip install --user` instead.
 Collecting pytest
@@ -74,68 +115,68 @@ Collecting pytest-cov
   Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/pytest-cov/2.12.1/pytest_cov-2.12.1-py2.py3-none-any.whl
 Collecting pytest-html
   Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/pytest-html/3.1.1/pytest_html-3.1.1-py3-none-any.whl
-Collecting iniconfig (from pytest)
-  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/iniconfig/1.1.1/iniconfig-1.1.1-py2.py3-none-any.whl
-Collecting py>=1.8.2 (from pytest)
-  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/py/1.10.0/py-1.10.0-py2.py3-none-any.whl (97kB)
 Collecting toml (from pytest)
   Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/toml/0.10.2/toml-0.10.2-py2.py3-none-any.whl
+Collecting pluggy<1.0.0a1,>=0.12 (from pytest)
+  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/pluggy/0.13.1/pluggy-0.13.1-py2.py3-none-any.whl
 Collecting attrs>=19.2.0 (from pytest)
   Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/attrs/21.2.0/attrs-21.2.0-py2.py3-none-any.whl (53kB)
 Collecting packaging (from pytest)
   Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/packaging/20.9/packaging-20.9-py2.py3-none-any.whl (40kB)
+Collecting py>=1.8.2 (from pytest)
+  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/py/1.10.0/py-1.10.0-py2.py3-none-any.whl (97kB)
+Collecting iniconfig (from pytest)
+  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/iniconfig/1.1.1/iniconfig-1.1.1-py2.py3-none-any.whl
 Collecting importlib-metadata>=0.12; python_version < "3.8" (from pytest)
   Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/importlib-metadata/4.5.0/importlib_metadata-4.5.0-py3-none-any.whl
-Collecting pluggy<1.0.0a1,>=0.12 (from pytest)
-  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/pluggy/0.13.1/pluggy-0.13.1-py2.py3-none-any.whl
-Collecting xmltodict (from moto)
-  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/xmltodict/0.12.0/xmltodict-0.12.0-py2.py3-none-any.whl
-Requirement already satisfied: python-dateutil<3.0.0,>=2.1 in /usr/local/lib/python3.6/site-packages (from moto)
-Collecting requests>=2.5 (from moto)
-  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/requests/2.25.1/requests-2.25.1-py2.py3-none-any.whl (61kB)
-Collecting more-itertools (from moto)
-  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/more-itertools/8.8.0/more_itertools-8.8.0-py3-none-any.whl (48kB)
-Requirement already satisfied: six>1.9 in /usr/local/lib/python3.6/site-packages (from moto)
-Requirement already satisfied: botocore>=1.12.201 in /usr/local/lib/python3.6/site-packages (from moto)
-Collecting responses>=0.9.0 (from moto)
-  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/responses/0.13.3/responses-0.13.3-py2.py3-none-any.whl
-Collecting Jinja2>=2.10.1 (from moto)
-  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/jinja2/3.0.1/Jinja2-3.0.1-py3-none-any.whl (133kB)
-Collecting boto3>=1.9.201 (from moto)
-  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/boto3/1.17.93/boto3-1.17.93-py2.py3-none-any.whl (131kB)
-Collecting pytz (from moto)
-  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/pytz/2021.1/pytz-2021.1-py2.py3-none-any.whl (510kB)
-Requirement already satisfied: setuptools in /usr/local/lib/python3.6/site-packages (from moto)
-Collecting werkzeug (from moto)
-  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/werkzeug/2.0.1/Werkzeug-2.0.1-py3-none-any.whl (288kB)
 Collecting MarkupSafe!=2.0.0a1 (from moto)
   Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/markupsafe/2.0.1/MarkupSafe-2.0.1-cp36-cp36m-manylinux1_x86_64.whl
+Collecting Jinja2>=2.10.1 (from moto)
+  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/jinja2/3.0.1/Jinja2-3.0.1-py3-none-any.whl (133kB)
+Collecting xmltodict (from moto)
+  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/xmltodict/0.12.0/xmltodict-0.12.0-py2.py3-none-any.whl
+Collecting more-itertools (from moto)
+  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/more-itertools/8.8.0/more_itertools-8.8.0-py3-none-any.whl (48kB)
+Collecting responses>=0.9.0 (from moto)
+  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/responses/0.13.3/responses-0.13.3-py2.py3-none-any.whl
+Collecting requests>=2.5 (from moto)
+  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/requests/2.25.1/requests-2.25.1-py2.py3-none-any.whl (61kB)
+Requirement already satisfied: python-dateutil<3.0.0,>=2.1 in /usr/local/lib/python3.6/site-packages (from moto)
+Requirement already satisfied: botocore>=1.12.201 in /usr/local/lib/python3.6/site-packages (from moto)
+Collecting werkzeug (from moto)
+  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/werkzeug/2.0.1/Werkzeug-2.0.1-py3-none-any.whl (288kB)
+Requirement already satisfied: six>1.9 in /usr/local/lib/python3.6/site-packages (from moto)
+Requirement already satisfied: setuptools in /usr/local/lib/python3.6/site-packages (from moto)
+Collecting pytz (from moto)
+  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/pytz/2021.1/pytz-2021.1-py2.py3-none-any.whl (510kB)
+Collecting boto3>=1.9.201 (from moto)
+  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/boto3/1.17.93/boto3-1.17.93-py2.py3-none-any.whl (131kB)
 Collecting cffi>=1.12 (from cryptography==3.3.1)
   Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/cffi/1.14.5/cffi-1.14.5-cp36-cp36m-manylinux1_x86_64.whl (401kB)
 Collecting pytest-metadata (from pytest-html)
   Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/pytest-metadata/1.11.0/pytest_metadata-1.11.0-py2.py3-none-any.whl
 Collecting pyparsing>=2.0.2 (from packaging->pytest)
   Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/pyparsing/2.4.7/pyparsing-2.4.7-py2.py3-none-any.whl (67kB)
-Collecting zipp>=0.5 (from importlib-metadata>=0.12; python_version < "3.8"->pytest)
-  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/zipp/3.4.1/zipp-3.4.1-py3-none-any.whl
 Collecting typing-extensions>=3.6.4; python_version < "3.8" (from importlib-metadata>=0.12; python_version < "3.8"->pytest)
   Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/typing-extensions/3.10.0.0/typing_extensions-3.10.0.0-py3-none-any.whl
-Collecting chardet<5,>=3.0.2 (from requests>=2.5->moto)
-  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/chardet/4.0.0/chardet-4.0.0-py2.py3-none-any.whl (178kB)
-Collecting idna<3,>=2.5 (from requests>=2.5->moto)
-  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/idna/2.10/idna-2.10-py2.py3-none-any.whl (58kB)
-Requirement already satisfied: urllib3<1.27,>=1.21.1 in /usr/local/lib/python3.6/site-packages (from requests>=2.5->moto)
+Collecting zipp>=0.5 (from importlib-metadata>=0.12; python_version < "3.8"->pytest)
+  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/zipp/3.4.1/zipp-3.4.1-py3-none-any.whl
+Requirement already satisfied: urllib3>=1.25.10 in /usr/local/lib/python3.6/site-packages (from responses>=0.9.0->moto)
 Collecting certifi>=2017.4.17 (from requests>=2.5->moto)
   Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/certifi/2021.5.30/certifi-2021.5.30-py2.py3-none-any.whl (145kB)
-Requirement already satisfied: docutils<0.16,>=0.10 in /usr/local/lib/python3.6/site-packages (from botocore>=1.12.201->moto)
+Collecting idna<3,>=2.5 (from requests>=2.5->moto)
+  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/idna/2.10/idna-2.10-py2.py3-none-any.whl (58kB)
+Collecting chardet<5,>=3.0.2 (from requests>=2.5->moto)
+  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/chardet/4.0.0/chardet-4.0.0-py2.py3-none-any.whl (178kB)
 Requirement already satisfied: jmespath<1.0.0,>=0.7.1 in /usr/local/lib/python3.6/site-packages (from botocore>=1.12.201->moto)
-Collecting s3transfer<0.5.0,>=0.4.0 (from boto3>=1.9.201->moto)
-  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/s3transfer/0.4.2/s3transfer-0.4.2-py2.py3-none-any.whl (79kB)
+Requirement already satisfied: docutils<0.16,>=0.10 in /usr/local/lib/python3.6/site-packages (from botocore>=1.12.201->moto)
 Collecting dataclasses; python_version < "3.7" (from werkzeug->moto)
   Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/dataclasses/0.8/dataclasses-0.8-py3-none-any.whl
+Collecting s3transfer<0.5.0,>=0.4.0 (from boto3>=1.9.201->moto)
+  Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/s3transfer/0.4.2/s3transfer-0.4.2-py2.py3-none-any.whl (79kB)
 Collecting pycparser (from cffi>=1.12->cryptography==3.3.1)
   Downloading http://nexus.opr.statefarm.org/repository/pypi.python.org/packages/pycparser/2.20/pycparser-2.20-py2.py3-none-any.whl (112kB)
-Installing collected packages: iniconfig, py, toml, attrs, pyparsing, packaging, zipp, typing-extensions, importlib-metadata, pluggy, pytest, xmltodict, chardet, idna, certifi, requests, more-itertools, responses, MarkupSafe, Jinja2, s3transfer, boto3, pytz, dataclasses, werkzeug, pycparser, cffi, cryptography, moto, coverage, pytest-cov, pytest-metadata, pytest-html
+Installing collected packages: toml, typing-extensions, zipp, importlib-metadata, pluggy, attrs, pyparsing, packaging, py, iniconfig, pytest, MarkupSafe, Jinja2, xmltodict, more-itertools, certifi, idna, chardet, requests, responses, pycparser, cffi, cryptography, dataclasses, werkzeug, pytz, s3transfer, boto3, moto, coverage, pytest-cov, pytest-metadata, pytest-html
   Found existing installation: s3transfer 0.3.3
     Uninstalling s3transfer-0.3.3:
       Successfully uninstalled s3transfer-0.3.3
@@ -145,45 +186,43 @@ Successfully installed Jinja2-3.0.1 MarkupSafe-2.0.1 attrs-21.2.0 boto3-1.17.93 
 platform linux -- Python 3.6.8, pytest-6.2.4, py-1.10.0, pluggy-0.13.1
 rootdir: /builds/dcs/bulk-ingestion-aws/eui-common-pl, configfile: pytest.ini
 plugins: cov-2.12.1, metadata-1.11.0, html-3.1.1
-collected 2 items / 2 errors
+collected 0 items / 1 error
 
 ==================================== ERRORS ====================================
-_____________ ERROR collecting tests/glue/test_eui_conformance.py ______________
-ImportError while importing test module '/builds/dcs/bulk-ingestion-aws/eui-common-pl/tests/glue/test_eui_conformance.py'.
-Hint: make sure your test modules/packages have valid Python names.
-Traceback:
+________________________ ERROR collecting test session _________________________
 /usr/lib64/python3.6/importlib/__init__.py:126: in import_module
     return _bootstrap._gcd_import(name[level:], package, level)
-tests/glue/test_eui_conformance.py:4: in <module>
-    from awsglue.context import GlueContext
-E   ModuleNotFoundError: No module named 'awsglue'
-__________ ERROR collecting tests/lambda/test_eui_cleanup_s3folder.py __________
-ImportError while importing test module '/builds/dcs/bulk-ingestion-aws/eui-common-pl/tests/lambda/test_eui_cleanup_s3folder.py'.
-Hint: make sure your test modules/packages have valid Python names.
-Traceback:
-/usr/lib64/python3.6/importlib/__init__.py:126: in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-tests/lambda/test_eui_cleanup_s3folder.py:9: in <module>
-    from src.main.lambdas.eui_cleanup_s3folder import lambda_handler, list_bucket_objects
-E   ModuleNotFoundError: No module named 'src'
+<frozen importlib._bootstrap>:994: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:971: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:955: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:665: in _load_unlocked
+    ???
+/usr/local/lib/python3.6/site-packages/_pytest/assertion/rewrite.py:170: in exec_module
+    exec(co, module.__dict__)
+numpy/conftest.py:7: in <module>
+    import hypothesis
+E   ModuleNotFoundError: No module named 'hypothesis'
 
 ----------- coverage: platform linux, python 3.6.8-final-0 -----------
 Coverage HTML written to dir htmlcov
 
 =========================== short test summary info ============================
-ERROR tests/glue/test_eui_conformance.py
-ERROR tests/lambda/test_eui_cleanup_s3folder.py
-!!!!!!!!!!!!!!!!!!! Interrupted: 2 errors during collection !!!!!!!!!!!!!!!!!!!!
-============================== 2 errors in 1.94s ===============================
-section_end:1623645253:step_script
-[0Ksection_start:1623645253:after_script
+ERROR  - ModuleNotFoundError: No module named 'hypothesis'
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+=============================== 1 error in 1.13s ===============================
+Coverage.py warning: No data was collected. (no-data-collected)
+section_end:1623647217:step_script
+[0Ksection_start:1623647217:after_script
 [0K[0K[36;1mRunning after_script[0;m
 [0;m[32;1mRunning after script...[0;m
 [32;1m$ mkdir -p euiingestion-application-code/coverage[0;m
 [32;1m$ cp -r htmlcov euiingestion-application-code/coverage[0;m
-section_end:1623645254:after_script
-[0Ksection_start:1623645254:cleanup_file_variables
+section_end:1623647218:after_script
+[0Ksection_start:1623647218:cleanup_file_variables
 [0K[0K[36;1mCleaning up file based variables[0;m
-[0;msection_end:1623645254:cleanup_file_variables
+[0;msection_end:1623647219:cleanup_file_variables
 [0K[31;1mERROR: Job failed: exit code 1
 [0;m
