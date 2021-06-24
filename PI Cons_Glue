@@ -1,0 +1,37 @@
+resource "aws_glue_job" "aws_glue_pl_conformance" {
+  for_each          = { for k, v in var.environments : k => v if var.create_flag } # this constracts allows to ignore the resource creation based on a condition  - new logic
+  name              = "${var.glue_pl_conformance_job_name}-${each.key}"
+  description       = "glue job to process data from raw to conform for eui optimization project"
+  role_arn          = var.iam_role_arn[each.key]
+  max_retries       = var.max_retries
+  timeout           = var.timeout_pl_conformance
+  glue_version      = "2.0"
+  tags              = var.tags[each.key]
+  number_of_workers = var.number_of_workers_pl_conformance
+  worker_type       = "G.1X"
+
+  default_arguments = {
+    "--continuous-log-logGroup"          = var.log_group_name_conformance[each.key]
+    "--enable-continuous-cloudwatch-log" = "true"
+    "--enable-continuous-log-filter"     = "true"
+    "--enable-metrics"                   = "true"
+    "--job-bookmark-option"              = "job-bookmark-enable"
+    "--TempDir"                          = "s3://${var.s3_script[each.key]}/temp/"
+    "--job-language"  = "python"
+    "--source_bucket" = var.source_bucket
+    "--dest_bucket"   = var.destination_bucket
+    "--source_prefix" = "pc/auto/multi-car-consolidation/${each.value}/${var.schema_version}/temp/"
+    "--dest_prefix"   = "pc/auto/multi-car-consolidation/${each.value}/${var.schema_version}/"
+  }
+
+  command {
+    name            = "gluePlConformance"
+    python_version  = 3
+    script_location = "s3://${var.s3_script[each.key]}/scripts/pl_consolidation.py"
+  }
+
+  execution_property {
+    max_concurrent_runs = var.max_concurrent_runs
+  }
+}
+
